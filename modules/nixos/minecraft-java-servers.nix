@@ -35,7 +35,7 @@ in {
     fabricer = {
       package = lib.mkOption {
         type = lib.types.package;
-        default = pkgs.fabricServers.fabric-1_21_4;
+        default = pkgs.fabricServers.fabric-1_21_1;
         defaultText = "pkgs.fabricServers.fabric-1_21_4";
         description = "Version of minecraft to run.";
       };

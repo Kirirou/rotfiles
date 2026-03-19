@@ -35,6 +35,20 @@
       umoria
       inputs.wfetch.packages.${pkgs.stdenv.hostPlatform.system}.wfetch
       # custom.wl_shimeji
+      (pkgs.writeShellApplication {
+        name = "bbb";
+        runtimeInputs = [ pkgs.ddcutil ];
+        text = ''
+          if [ -z "$1" ] || [ "$1" -lt 0 ] || [ "$1" -gt 100 ]; then
+            echo "Usage: bbb <0-100>"
+            exit 1
+          fi
+
+          for i in $(seq 1 5); do
+            sudo ddcutil --display "$i" setvcp 10 "$1"
+          done
+        '';
+      })
     ];
 
     shellAliases = {

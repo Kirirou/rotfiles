@@ -39,6 +39,7 @@
     hwatch
     entr
     ent
+    nethogs
     mprocs
     presenterm
     # coreutils-full

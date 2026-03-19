@@ -53,7 +53,7 @@
       opsJson = [
         {
           uuid = "2cbb65e9-088b-48d8-be9e-0f7b4d0c0b62";
-          name = "sqwqko";
+          name = "kyryro";
           level = 4;
           bypassesPlayerLimit = false;
         }
@@ -61,7 +61,7 @@
       serverProperties = {
         enable-jmx-monitoring = false;
         "rcon.port" = 2526;
-        server-port = 25595;
+        server-port = 25565;
         level-seed = "";
         gamemode = "survival";
         enable-command-block = true;
@@ -74,7 +74,7 @@
         pvp = false;
         generate-structures = true;
         max-chained-neighbor-updates = 1000000;
-        difficulty = "easy";
+        difficulty = "hard";
         network-compression-threshold = 256;
         max-tick-time = 60000;
         require-resource-pack = false;
@@ -86,7 +86,7 @@
         initial-disabled-packs = "";
         broadcast-rcon-to-ops = true;
         view-distance = 64;
-        server-ip = "0.0.0.0";
+        server-ip = "192.168.1.101";
         resource-pack-prompt = "";
         allow-nether = false;
         enable-rcon = true;

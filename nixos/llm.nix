@@ -33,6 +33,8 @@ let
 
     pkgs.sillytavern
     # pkgs.zluda
+    #
+    pkgs.claude-code
   ];
 in
 lib.mkIf config.custom.llm.enable {

@@ -19,7 +19,7 @@
       packages = lib.mkOption {
         type = lib.types.listOf lib.types.package;
         default = with pkgs; [
-          # font-manager
+          font-manager
           monocraft
           noto-fonts
           noto-fonts-cjk-sans
@@ -44,6 +44,18 @@
           jigmo
           rictydiminished-with-firacode
           wqy_zenhei
+
+          (pkgs.stdenvNoCC.mkDerivation {
+            name = "minecraft-standard-galactic-alphabet";
+            src = ./minecraft-standard-galactic-alphabet.otf.zip;
+            nativeBuildInputs = [ pkgs.unzip ];
+            sourceRoot = ".";
+            installPhase = ''
+              mkdir -p $out/share/fonts/opentype
+              cp *.otf $out/share/fonts/opentype/
+            '';
+          })
+
         ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
         description = "The packages to install for the fonts";
       };

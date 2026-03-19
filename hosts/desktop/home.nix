@@ -37,32 +37,22 @@
       {
         display_name_output = "DP-3";
         mode = "2560x1080@200";
-        position = "-2560x0";
+        position = "2560x1440";
         addreserved = "0, 0, 0, 600,";
         scale = 1.0;
         transform = 0;
-        workspace_names = [ "a" "s" "d" ];
-        workspaces = [ 8 9 10 ];
+        workspace_names = [ "a" "s" "d" "4" ];
+        workspaces = [ 8 9 10 4 ];
       }
       {
         display_name_output = "HDMI-A-4";
         mode = "1920x1080@60";
-        position = "1920x1440";
+        position = "0x1440";
         addreserved = "0, 0, 0, 0,";
         scale = 1.0;
         transform = 0;
         workspace_names = [ "x" "c" ];
         workspaces = [ 12 13 ];
-      }
-      {
-        display_name_output = "DP-2";
-        mode = "3440x1440@200";
-        position = "5120x-1500";
-        addreserved = "1800, 0, 0, 0";
-        scale = 1.0;
-        transform = 3;
-        workspace_names = [ "4" "a" "s" "d"];
-        workspaces = [ 4 8 9 10 ];
       }
     ];
     terminal.size = 8;

@@ -28,7 +28,7 @@ in
   home = {
     pointerCursor = lib.mkIf isNixOS {
       package = pkgs.simp1e-cursors;
-      name = "Simp1e-Catppuccin-Frappe";
+      name = "Simp1e-Gruvbox-Dark";
       size = 28;
       gtk.enable = true;
       x11.enable = true;
@@ -50,19 +50,19 @@ in
     };
   };
 
-  home.sessionVariables.GTK_THEME = "Kanagawa-BL-LB";
+  home.sessionVariables.GTK_THEME = "Gruvbox-Dark";
 
   home.packages = [ pkgs.gtk-engine-murrine ];
 
   gtk = {
     enable = true;
     theme = {
-      name = "Kanagawa-BL-LB";
-      package = pkgs.kanagawa-gtk-theme;
+      name = "Gruvbox-Dark";
+      package = pkgs.gruvbox-gtk-theme;
     };
     iconTheme = {
-      name = "Tela circle dark";
-      package = pkgs.tela-circle-icon-theme;      
+      name = "oomox-gruvbox-dark";
+      package = pkgs.gruvbox-dark-icons-gtk;      
     };
     font = {
       name = "${config.custom.fonts.monospace}";
@@ -78,6 +78,7 @@ in
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;
     };
+    # gtk4.extraCss = builtins.readFile "${pkgs.gruvbox-gtk-theme}/share/themes/Gruvbox-Dark/gtk-4.0/gtk.css";
   };
 
   # write theme accents into nix.json for rust to read

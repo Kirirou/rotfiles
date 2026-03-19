@@ -35,49 +35,6 @@ in {
       # FIX bug with input
       # https://github.com/hyprwm/Hyprland/issues/5815
       file.".config/fcitx5/conf/waylandim.conf".text = "PreferKeyEvent=False";
-
-      file.".config/hypr/scripts/toggle-r1999-wallpaper.sh" = {
-        executable = true;
-        text = ''
-          #!/usr/bin/env bash
-          set -euo pipefail
-
-          CLASS="steam_app_3092660"
-          SPECIAL="special:wallpaper"
-
-          # Find the first matching window address (0x...)
-          ADDR="$(hyprctl clients -j | jq -r ".[] | select(.class==\"$CLASS\") | .address" | head -n1)"
-          [ -z "$ADDR" ] && exit 0
-
-          # Read pinned state
-          PINNED="$(hyprctl clients -j | jq -r ".[] | select(.address==\"$ADDR\") | .pinned")"
-
-          # Make sure commands apply to the right window by focusing it first
-          hyprctl dispatch focuswindow "address:$ADDR" >/dev/null
-
-          if [ "$PINNED" = "true" ]; then
-            # ---- NORMAL MODE ----
-            # Unpin (toggle), then you can control it normally again.
-            hyprctl dispatch pin >/dev/null
-
-            # Bring it to the current workspace (optional; comment out if you prefer it stays where it was)
-            hyprctl dispatch movetoworkspace "$(hyprctl activeworkspace -j | jq -r .name)" >/dev/null
-
-            # Optional: fullscreen it again if you like
-            # hyprctl dispatch fullscreen 2 >/dev/null
-          else
-            # ---- WALLPAPER MODE ----
-            # If it is fullscreen, drop fullscreen first so it behaves nicely as a “background”
-            hyprctl dispatch fullscreen 0 >/dev/null || true
-
-            # Pin it (toggle) so it stays around
-            hyprctl dispatch pin >/dev/null
-
-            # Move to a special workspace so you can show/hide it easily
-            hyprctl dispatch movetoworkspace "$SPECIAL" >/dev/null
-          fi
-        '';
-      };
     };
 
     # Hyprland plugins go here
