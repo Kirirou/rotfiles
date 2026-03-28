@@ -59,7 +59,7 @@
       alsa-lib
       alsa-utils
       pavucontrol
-      helvum
+      crosspipe
       # easyeffects
       pulseaudio
       qjackctl

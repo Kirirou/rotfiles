@@ -9,23 +9,6 @@
   boot.zfs.allowHibernation = true;
   boot.zfs.forceImportRoot = false;
 
-  systemd.sleep.extraConfig = ''
-    AllowSuspend=no
-    AllowHibernation=no
-    AllowSuspendThenHibernate=no
-    AllowHybridSleep=no
-    #SuspendMode=
-    SuspendState=mem standby freeze
-    # Configure suspend as hybrid-sleep
-    SuspendMode=suspend platform shutdown
-    SuspendState=disk
-    HibernateMode=platform shutdown
-    HibernateState=disk
-    HybridSleepMode=suspend platform shutdown
-    HybridSleepState=disk
-    HibernateDelaySec=60min
-  '';
-
   systemd.targets = {
     sleep.enable = false;
     suspend.enable = false;
