@@ -94,8 +94,8 @@ in {
             (mkOutOfStoreSymlink "${wdc-data-mountpoint}/_VIDEOS");
           "Documents".source = lib.mkIf cfg.wdc1tb
             (mkOutOfStoreSymlink "${wdc-data-mountpoint}/_DOCUMENTS");
-          "Desktop".source = lib.mkIf cfg.wdc1tb
-            (mkOutOfStoreSymlink "${wdc-data-mountpoint}/_DESKTOP");
+          # "Desktop".source = lib.mkIf cfg.wdc1tb
+          #   (mkOutOfStoreSymlink "${wdc-data-mountpoint}/_DESKTOP");
           ".config/DecentSampler".source = lib.mkIf config.hm.custom.reaper.enable
             (mkOutOfStoreSymlink "${wdc-okii-mountpoint}/DecentSampler");
         };

@@ -13,7 +13,6 @@
       Pw = "~/Pictures/Wallpapers";
       dw = "~/Downloads";
       docs = "~/Documents";
-      desk = "~/Desktop";
       wdd = "/md/wdc-data";
       stsea = "/md/stsea-okii";
       wdsmall = "/md/wdc-data/_SMALL";

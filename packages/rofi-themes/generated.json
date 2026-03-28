@@ -1,6 +1,6 @@
 {
     "rofi-themes": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": "2025-07-26",
         "extract": null,
         "name": "rofi-themes",

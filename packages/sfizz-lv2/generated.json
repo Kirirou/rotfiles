@@ -1,6 +1,6 @@
 {
     "sfizz-lv2": {
-        "cargoLocks": null,
+        "cargoLock": null,
         "date": "2025-03-19",
         "extract": null,
         "name": "sfizz-lv2",
