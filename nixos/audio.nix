@@ -17,6 +17,11 @@
     };
     services.pulseaudio.enable = false;
 
+    systemd.services.pipewire.serviceConfig.CPUAffinity = "4,5";
+    systemd.user.services.pipewire.serviceConfig.CPUAffinity = "4,5";
+    systemd.user.services.wireplumber.serviceConfig.CPUAffinity = "4,5";
+    systemd.user.services.pipewire-pulse.serviceConfig.CPUAffinity = "4,5";
+
     # services.jack = {
     #   jackd.enable = true;
     #   # support ALSA only programs via ALSA JACK PCM plugin
@@ -34,6 +39,7 @@
     services.pipewire.extraConfig.pipewire."92-low-latency" = {
       context.properties = {
         default.clock.rate = 48000;
+        default.clock.allowed-rates = [ 48000 ];
         default.clock.quantum = 1024;
         default.clock.min-quantum = 32;
         default.clock.max-quantum = 8192;

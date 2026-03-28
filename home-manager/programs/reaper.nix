@@ -147,6 +147,9 @@ config = lib.mkIf config.custom.reaper.enable {
         submap = reset
     '';
 
+    home.shellAliases = {
+      "5reaper" = "taskset -c 4-5 reaper";
+    };
 
     custom.persist = {
       home.directories = [

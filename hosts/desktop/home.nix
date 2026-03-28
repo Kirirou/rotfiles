@@ -25,7 +25,7 @@
     # first monitor in list gets selected for waybar to show only at that monitor
     displays = [
       {
-        display_name_output = "DP-4";
+        display_name_output = "DP-3";
         mode = "5120x1440@144";
         position = "0x0";
         addreserved = "0, 0, 0, 0,";
@@ -35,7 +35,7 @@
         workspaces = [ 1 2 3 5 6 7 ];
       }
       {
-        display_name_output = "DP-3";
+        display_name_output = "DP-2";
         mode = "2560x1080@200";
         position = "2560x1440";
         addreserved = "0, 0, 0, 600,";
@@ -45,7 +45,7 @@
         workspaces = [ 8 9 10 4 ];
       }
       {
-        display_name_output = "HDMI-A-4";
+        display_name_output = "HDMI-A-1";
         mode = "1920x1080@60";
         position = "0x1440";
         addreserved = "0, 0, 0, 0,";

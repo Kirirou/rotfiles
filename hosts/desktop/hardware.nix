@@ -31,10 +31,17 @@
     "boot.shell_on_fail"
     "acpi_backlight=vendor"
     "video.use_native_backlight=1"
+    "isolcpus=4,5"
+    "irqaffinity=0-3"
+    "cgroup_enable=cpuset"
   ];
   boot.tmp.useTmpfs = true;
 
   boot.kernel.sysctl."kernel.unprivileged_userns_clone" = 1;
+
+  nix.settings.max-jobs = 4;
+  nix.settings.cores = 4;
+  systemd.settings.Manager.DefaultCPUAccounting = true;
 
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
