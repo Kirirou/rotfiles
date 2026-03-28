@@ -26,11 +26,12 @@
       };
     };
   };
-  home.packages = [ pkgs.kdePackages.okular ];
+  home.packages = [ pkgs.kdePackages.okular pkgs.jabref ];
 
   custom.persist.home.files = [
     ".config/okularpartrc"
     ".config/okularrc"
+    ".local/share/jabref"
   ];
 
   custom.wallust.templates.zathurarc = lib.mkIf config.programs.zathura.enable {

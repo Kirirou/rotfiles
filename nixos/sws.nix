@@ -22,8 +22,10 @@ in lib.mkMerge [
 
   environment.systemPackages = [ pkgs.copyparty ];
 
+  services.onedrive.enable = true;
+
   services.copyparty = {
-    enable = true;
+    enable = false;
     # directly maps to values in the [global] section of the copyparty config.
     # see `copyparty --help` for available options
     settings = {

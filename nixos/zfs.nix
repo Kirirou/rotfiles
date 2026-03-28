@@ -14,7 +14,7 @@ in
     # booting with zfs
     supportedFilesystems = [ "zfs" ];
     # kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-    kernelPackages = pkgs.linuxPackages_xanmod_latest;
+    # kernelPackages = pkgs.linuxPackages_xanmod_latest; # commented out because of musnix owning it now in audio.nix
 
     zfs = {
       devNodes = lib.mkDefault "/dev/disk/by-id";

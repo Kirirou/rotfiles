@@ -35,6 +35,7 @@ let
     # pkgs.zluda
     #
     pkgs.claude-code
+
   ];
 in
 lib.mkIf config.custom.llm.enable {
@@ -126,6 +127,8 @@ lib.mkIf config.custom.llm.enable {
     home.directories = [
       ".ollama"
       ".config/aichat"
+      ".claude"
+      ".cache/whisper"
     ];
     root.directories = [
       # "/var/lib/ollama"
