@@ -3,7 +3,7 @@
 set -e
 
 echo "Current latest remote commit:"
-git ls-remote -h https://github.com/noisetide/rotfiles master
+git ls-remote -h https://github.com/Kirirou/rotfiles master
 echo ""
 
 # Check for fzf
@@ -456,5 +456,5 @@ if [[ $flake_path == "y" ]]; then
 else
     read -rp "Enter git rev for flake (default: master): " git_rev
     echo "Recovering NixOS..."
-    sudo nixos-install --flake "github:noisetide/rotfiles/${git_rev:-master}#$host"
+    sudo nixos-install --flake "github:Kirirou/rotfiles/${git_rev:-master}#$host"
 fi

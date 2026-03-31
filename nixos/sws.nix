@@ -13,7 +13,7 @@ in lib.mkMerge [
 {
   security.acme = {
     acceptTerms = true;
-    defaults.email = "noisetide@proton.me";
+    defaults.email = "souonchouryuu@proton.me";
   };
 
   # Now we need to open port 80 for the ACME challenge and port 443 for SWS itself

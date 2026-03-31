@@ -17,10 +17,10 @@
     };
     services.pulseaudio.enable = false;
 
-    systemd.services.pipewire.serviceConfig.CPUAffinity = "4,5";
-    systemd.user.services.pipewire.serviceConfig.CPUAffinity = "4,5";
-    systemd.user.services.wireplumber.serviceConfig.CPUAffinity = "4,5";
-    systemd.user.services.pipewire-pulse.serviceConfig.CPUAffinity = "4,5";
+    systemd.services.pipewire.serviceConfig.CPUAffinity = "3,4,5";
+    systemd.user.services.pipewire.serviceConfig.CPUAffinity = "3,4,5";
+    systemd.user.services.wireplumber.serviceConfig.CPUAffinity = "3,4,5";
+    systemd.user.services.pipewire-pulse.serviceConfig.CPUAffinity = "3,4,5";
 
     # services.jack = {
     #   jackd.enable = true;

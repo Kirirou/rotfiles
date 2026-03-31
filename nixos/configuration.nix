@@ -26,10 +26,6 @@
     };
   };
 
-  nix.settings.max-jobs = 4;
-  nix.settings.cores = 4;
-  systemd.settings.Manager.DefaultCPUAccounting = true;
-
   environment.systemPackages = [ pkgs.sbctl ]; # for secure boot
   # environment.variables = {
   #   CMAKE_POLICY_VERSION_MINIMUM = "3.5";

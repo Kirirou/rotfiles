@@ -39,8 +39,8 @@
 
   boot.kernel.sysctl."kernel.unprivileged_userns_clone" = 1;
 
-  nix.settings.max-jobs = 4;
-  nix.settings.cores = 4;
+  nix.settings.max-jobs = 3;
+  nix.settings.cores = 3;
   systemd.settings.Manager.DefaultCPUAccounting = true;
 
 

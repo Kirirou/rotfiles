@@ -20,7 +20,7 @@ Run the following commands from a terminal on a NixOS live iso or from a tty on 
 The following install script partitions the disk, sets up the necessary datasets and installs NixOS.
 
 ```sh
-sh <(curl -L https://raw.githubusercontent.com/noisetide/rotfiles/master/install.sh)
+sh <(curl -L https://raw.githubusercontent.com/Kirirou/rotfiles/master/install.sh)
 ```
 Reboot your system.
 
@@ -71,7 +71,7 @@ Run the following commands from a terminal on a NixOS live iso / from a tty on t
 The following script optionally reformats the boot partition and / or /nix dataset, then reinstalls NixOS.
 
 ```sh
-sh <(curl -L https://raw.githubusercontent.com/noisetide/rotfiles/master/recover.sh)
+sh <(curl -L https://raw.githubusercontent.com/Kirirou/rotfiles/master/recover.sh)
 ```
 
 # Check out `iynaix/dotfiles`
@@ -80,5 +80,5 @@ This repo was forked from my friend [Iynaix's config](https://github.com/iynaix/
 
 # Screenshots of the rice
 
-![Rice1](https://github.com/noisetide/rotfiles/blob/master/rice.png?raw=true)
-![Rice2](https://github.com/noisetide/rotfiles/blob/master/rice2.png?raw=true)
+![Rice1](https://github.com/Kirirou/rotfiles/blob/master/rice.png?raw=true)
+![Rice2](https://github.com/Kirirou/rotfiles/blob/master/rice2.png?raw=true)

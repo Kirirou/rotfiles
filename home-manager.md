@@ -20,7 +20,7 @@ Substitute `desktop` with desired host
 ```sh
 mkdir -p ~/pr
 cd ~/pr
-git clone https://github.com/noisetide/rotfiles
+git clone https://github.com/Kirirou/rotfiles
 cd rotfiles
 nix-shell -p home-manager
 NIXPKGS_ALLOW_UNFREE=1 home-manager --extra-experimental-features "nix-command flakes" switch --flake ".#desktop"

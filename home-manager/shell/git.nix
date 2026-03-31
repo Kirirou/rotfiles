@@ -60,7 +60,7 @@ in {
       };
       settings = {
         user.name = "Kirirou Otomichi";
-        user.email = "noisetide@proton.me";
+        user.email = "souonchouryuu@proton.me";
         init = {defaultBranch = "master";};
         push.autoSetupRemote = true;
         # remote.origin.push = "HEAD";

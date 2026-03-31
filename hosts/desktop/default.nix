@@ -55,10 +55,14 @@
     };
     wantedBy = [ "default.target" ];
   };
+  services.udev.enable = true;
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="22b8", ATTR{idProduct}=="2e81", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}+="scrcpy.service"
   '';
 
+    users.users.${user} = {...}: {
+      extraGroups = [ "plugdev" ];
+    };
 
   services.displayManager.autoLogin.user = user;
 

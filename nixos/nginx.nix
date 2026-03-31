@@ -3,7 +3,7 @@ lib.mkMerge [
 (lib.mkIf config.custom.nginx.enable {
   security.acme = {
     acceptTerms = true;
-    defaults.email = "noisetide@proton.me";
+    defaults.email = "souonchouryuu@proton.me";
   };
 
   services.nginx = {
