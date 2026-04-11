@@ -163,14 +163,14 @@
           libxkbcommon
           alsa-lib
           pulseaudio
-          xorg.libX11
-          xorg.libXcomposite
-          xorg.libXdamage
-          xorg.libXfixes
-          xorg.libXrandr
-          xorg.libXcursor
-          xorg.libXi
-          xorg.libXtst
+          libx11
+          libxcomposite
+          libxdamage
+          libxfixes
+          libxrandr
+          libxcursor
+          libxi
+          libxtst
 
           gdb
           scanmem

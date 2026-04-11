@@ -56,8 +56,8 @@
         vulkan-memory-allocator
         vulkan-validation-layers
         vulkan-utility-libraries
-        xorg.libXi xorg.libXmu freeglut
-        xorg.libXext xorg.libX11 xorg.libXv xorg.libXrandr zlib 
+        libxi libxmu freeglut
+        libxext libx11 libxv libxrandr zlib 
         linuxPackages.nvidia_x11
         libGLU libGL
         linuxHeaders

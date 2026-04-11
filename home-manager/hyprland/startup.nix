@@ -63,9 +63,9 @@ in {
       "waybar &"
 
       # fix gparted "cannot open display: :0" error
-      "${lib.getExe pkgs.xorg.xhost} +local:${user}"
+      "${lib.getExe pkgs.xhost} +local:${user}"
       # fix Authorization required, but no authorization pcustomocol specified error
-      # "${pkgs.xorg.xhost}/bin/xhost si:localuser:root"
+      # "${pkgs.xhost}/bin/xhost si:localuser:root"
 
       # stop fucking with my cursors
       "hyprctl setcursor ${config.home.pointerCursor.name} ${toString config.home.pointerCursor.size}"

@@ -43,10 +43,10 @@
             lld
 
             libGL
-            xorg.libx11
-            xorg.libxcursor
-            xorg.libxi
-            xorg.libxrandr
+            libx11
+            libxcursor
+            libxi
+            libxrandr
             libxkbcommon
             wayland
           ];
@@ -63,11 +63,11 @@
             lld
 
             libGL
-            xorg.libx11
-            xorg.libx11
-            xorg.libxcursor
-            xorg.libxi
-            xorg.libxrandr
+            libx11
+            libx11
+            libxcursor
+            libxi
+            libxrandr
             libxkbcommon
             wayland
 

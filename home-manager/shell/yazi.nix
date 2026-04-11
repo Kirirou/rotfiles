@@ -4,6 +4,7 @@
     enable = true;
     enableBashIntegration = true;
     enableFishIntegration = true;
+    shellWrapperName = "yy";
 
     settings = {
       manager = {

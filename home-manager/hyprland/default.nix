@@ -229,7 +229,7 @@ in {
         "match:class YouTube, idle_inhibit focus"
         "match:class mpv, idle_inhibit focus"
         "match:class REAPER, idle_inhibit focus"
-        "match:class ^(REAPER)$, stay_focused on"
+        # "match:class ^(REAPER)$, stay_focused on"
       ];
 
       exec-once = [
