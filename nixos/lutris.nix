@@ -5,7 +5,16 @@
   ...
 }:
 lib.mkIf config.custom.lutris.enable {
-  virtualisation.waydroid.enable = true;
+  virtualisation.waydroid = {
+    enable = true;
+    package = pkgs.waydroid.overrideAttrs (old: {
+      postPatch = (old.postPatch or "") + ''
+        substituteInPlace data/scripts/waydroid-net.sh \
+          --replace "iptables" "iptables-nft"
+      '';
+    });
+  };
+  networking.networkmanager.unmanaged = [ "interface-name:waydroid0" ];
   environment.systemPackages = with pkgs; [
     (lutris.override {
       extraPkgs = _pkgs: [

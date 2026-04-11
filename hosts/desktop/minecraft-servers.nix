@@ -46,7 +46,7 @@
     };
     services.minecraft-java-servers.fabricer = {
       enable = true;
-      do-run = true;
+      do-run = false;
       autoStart = true;
       dataDir = "/srv/minecraft-java-server-fabricer";
       jvmOpts = "-Xms12g -Xmx16g -XX:+UseG1GC -XX:ParallelGCThreads=4";

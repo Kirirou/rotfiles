@@ -12,7 +12,7 @@ lib.mkIf config.custom.dns.enable {
         file = pkgs.writeText "zone-farmtasker.au" ''
           $ORIGIN farmtasker.au.
           $TTL 2d
-          @            IN      SOA     1.1.1.1 8.8.8.8 (
+          @            IN      SOA     ns1.farmtasker.au. admin.farmtasker.au. (
                                  1    ; Serial
                                  3h   ; Refresh
                                  1h   ; Retry
@@ -20,14 +20,12 @@ lib.mkIf config.custom.dns.enable {
                                  1h)  ; Negative Cache TTL
                        IN      NS      ns1
                        IN      NS      ns2
-
           @            IN      A       93.127.166.200
           coolify      IN      A       93.127.166.200
           pr           IN      A       192.168.1.101
           local        IN      A       192.168.1.101
           jellyfin     IN      A       192.168.1.101
           nextcloud    IN      A       192.168.1.101
-
           ns1          IN      A       192.168.1.101
           ns2          IN      A       192.168.1.101
         '';
@@ -35,4 +33,5 @@ lib.mkIf config.custom.dns.enable {
     };
   };
   networking.firewall.allowedTCPPorts = [ 53 ];
+  networking.firewall.allowedUDPPorts = [ 53 ];
 }
