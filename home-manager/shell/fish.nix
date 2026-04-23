@@ -38,7 +38,7 @@ in {
 
           # set options for plugins
           set sponge_regex_patterns 'password|passwd'
-          set sponge_filter_failed 'false'
+          set sponge_filter_failed true
         ''
         # wallust colorscheme
         + lib.optionalString config.custom.wallust.enable ''
@@ -53,7 +53,7 @@ in {
   # fish plugins, home-manager's programs.fish.plugins has a weird format
   home.packages = with pkgs.fishPlugins; [
     # used as starship's transient prompt does not handle empty commands
-    transient-fish
+    # transient-fish
     # do not add failed commands to history
     sponge
   ];

@@ -179,6 +179,7 @@
 
           jdk25
 
+          poppler-utils
           cups-pdf-to-pdf
           sane-airscan
           simple-scan

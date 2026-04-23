@@ -44,9 +44,9 @@
     "boot.shell_on_fail"
     "acpi_backlight=vendor"
     "video.use_native_backlight=1"
-    "isolcpus=3,4,5"
-    "nohz_full=3,4,5"
-    "rcu_nocbs=3,4,5"
+    "isolcpus=5"
+    "nohz_full=5"
+    "rcu_nocbs=5"
     "threadirqs"
   ];
   boot.tmp.useTmpfs = true;

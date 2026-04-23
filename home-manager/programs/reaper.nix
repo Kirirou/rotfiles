@@ -13,6 +13,7 @@ config = lib.mkIf config.custom.reaper.enable {
       # -----
       pkgs.reaper
       pkgs.reaper-sws-extension
+      pkgs.audacity
 
       # PLUGINS:
       # --------

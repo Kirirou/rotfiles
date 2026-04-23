@@ -24,7 +24,6 @@
         "$git_status"
         "$nix_shell"
         "$cmd_duration"
-        "$line_break"
         "$python"
         "$character"
       ];

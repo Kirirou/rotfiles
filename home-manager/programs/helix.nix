@@ -27,6 +27,34 @@ in
       pkgs.yamlfmt
       pkgs.yaml-language-server
       pkgs.bash-language-server
+
+      (pkgs.writeShellScriptBin "latex-watch" ''
+        if [ -z "$1" ]; then
+          echo "Usage: latex-watch <file.tex>"
+          exit 1
+        fi
+
+        FILE="$1"
+        PDF="$(basename "$FILE" .tex).pdf"
+        CLASS="org.pwmt.zathura"
+
+        while true; do
+          ${pkgs.inotify-tools}/bin/inotifywait -qq -e close_write "$FILE"
+
+          ${pkgs.procps}/bin/pkill -f "zathura.*$PDF"
+
+          ${pkgs.texlive.combined.scheme-small}/bin/pdflatex -interaction=nonstopmode "$FILE" >/dev/null
+
+          ${pkgs.zathura}/bin/zathura "$PDF" &
+
+          sleep 0.4
+
+          ${pkgs.hyprland}/bin/hyprctl dispatch focuswindow "class:($CLASS)"
+          ${pkgs.hyprland}/bin/hyprctl dispatch setfloating active
+          ${pkgs.hyprland}/bin/hyprctl dispatch resizeactive exact 1000 1200
+          ${pkgs.hyprland}/bin/hyprctl dispatch moveactive exact 2060 120
+        done
+      '')
     ];
     programs.helix = {
       enable = true;
