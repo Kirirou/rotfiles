@@ -57,6 +57,7 @@ in {
       signing = lib.mkIf cfg.enable {
         signByDefault = true;
         key = cfg.git-keyid;
+        format = "openpgp";
       };
       settings = {
         user.name = "Kirirou Otomichi";

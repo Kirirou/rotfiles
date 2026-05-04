@@ -52,6 +52,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ie-r = {
+      url = "github:miaupaw/ie-r";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
   };

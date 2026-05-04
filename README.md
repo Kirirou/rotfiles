@@ -1,4 +1,4 @@
-# Sawako's NixOS Config
+# NixOS Config
 
 Forked from [iynaix/dotfiles](https://github.com/iynaix/dotfiles).
 
