@@ -71,7 +71,16 @@ in
 
   systemd.services.systemd-udev-settle.enable = false;
 
-  environment.systemPackages = [ pkgs.sanoid ];
+  environment.systemPackages = [
+    pkgs.sanoid
+    (pkgs.writeShellScriptBin "zfs-rollback" ''
+      DATASET=$(zfs list -H -o name | ${pkgs.fzf}/bin/fzf --header="Select dataset")
+      [ -z "$DATASET" ] && exit 1
+      SNAPSHOT=$(zfs list -t snapshot -r "$DATASET" -o name -H | ${pkgs.fzf}/bin/fzf --header="Select snapshot")
+      [ -z "$SNAPSHOT" ] && exit 1
+      sudo zfs rollback -r "$SNAPSHOT"
+    '')
+  ];
 
   services.sanoid = lib.mkIf cfg.snapshots {
     enable = true;

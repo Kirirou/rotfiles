@@ -16,23 +16,19 @@
       jack.enable = true;
     };
     services.pulseaudio.enable = false;
-
     systemd.user.services.pipewire.serviceConfig.AllowedCPUs = "5";
     systemd.user.services.wireplumber.serviceConfig.AllowedCPUs = "5";
     systemd.user.services.pipewire-pulse.serviceConfig.AllowedCPUs = "5";
-
     security.pam.loginLimits = [
       { domain = "${user}"; type = "-"; item = "rtprio"; value = "95"; }
       { domain = "${user}"; type = "-"; item = "memlock"; value = "unlimited"; }
       { domain = "${user}"; type = "-"; item = "nice"; value = "-20"; }
     ];
-
     services.pipewire.extraConfig.pipewire."91-rt-affinity" = {
       context.properties = {
         "cpu.affinity" = "5";
       };
     };
-
     services.pipewire.extraConfig.pipewire."92-low-latency" = {
       "context.properties" = {
         "default.clock.rate" = 48000;
@@ -42,7 +38,6 @@
         "default.clock.max-quantum" = 512;
       };
     };
-
     musnix = {
       enable = true;
       rtcqs.enable = true;
@@ -56,13 +51,11 @@
     users.users.${user} = {
       extraGroups = ["jackaudio" "audio" ];
     };
-
     custom.persist.home.directories = [
       ".config/rncbc.org"
       ".local/share/easyeffects"
       ".config/easyeffects"
-    ];    
-
+    ];
     environment.systemPackages = with pkgs; [
       sox
       alsa-lib
@@ -73,8 +66,26 @@
       pulseaudio
       qjackctl
       qpwgraph
-      # jack2
       vmpk # piano
+      rnnoise
+      rnnoise-plugin
     ];
+    # easyeffects rnnoise preset
+    hm.home.file.".config/easyeffects/input/rnnoise.json".text = builtins.toJSON {
+      input = {
+        blocklist = [];
+        plugins_order = ["rnnoise"];
+        rnnoise = {
+          bypass = false;
+          enable-va = true;
+          input-gain = 0.0;
+          model-name = "";
+          model-path = "";
+          output-gain = 0.0;
+          release-time = 20.0;
+          vad-thres = 50.0;
+        };
+      };
+    };
   };
 }

@@ -36,6 +36,7 @@ in
 
     sessionVariables = {
       XCURSOR_SIZE = config.home.pointerCursor.size;
+      ADW_DEBUG_COLOR_SCHEME = "prefer-dark";
     };
   };
 
@@ -44,6 +45,11 @@ in
     "ca/desrt/dconf-editor" = {
       show-warning = false;
     };
+
+    "com/github/wwmm/easyeffects" = {
+        use-dark-theme = true;
+    };
+    
     # set dark theme for gtk 4
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
