@@ -11,7 +11,6 @@
         workspaces = [ 1 2 3 4 5 6 7 8 9 10 ];
       }
     ];
-    mouse_sensitivity = 0.5;
     hyprland = {
       modkey = "SUPER";
       autostart = false;
@@ -40,6 +39,9 @@
 
     kiwix.enable = true;
 
+
+    hyprland = {
+      modkey = "SUPER";
     # blender.enable = true;
     # reaper.enable = false;
 

@@ -3,6 +3,8 @@
     kbLayout = "jp";
     wifi.enable = true;
     backlight.enable = true;
+    mouse_sensitivity = 0.5;
+
 
     # Config for the hyprland monitors
     # https://wiki.hyprland.org/Configuring/Monitors/
