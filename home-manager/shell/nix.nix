@@ -69,7 +69,9 @@ in {
         # stop bothering me about untracked files
         untracked_files=$(git ls-files --exclude-standard --others .)
         if [ -n "$untracked_files" ]; then
-            git add "$untracked_files"
+          while IFS= read -r file; do
+          git add -- "$file"
+          done <<< "$untracked_files"
         fi
 
         # force switch to always use current host
@@ -114,7 +116,9 @@ in {
         # stop bothering me about untracked files
         untracked_files=$(git ls-files --exclude-standard --others .)
         if [ -n "$untracked_files" ]; then
-            git add "$untracked_files"
+            while IFS= read -r file; do
+                git add -- "$file"
+            done <<< "$untracked_files"
         fi
 
         # force test to always use current host

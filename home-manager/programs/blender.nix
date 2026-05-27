@@ -13,6 +13,7 @@
       pkgs.unityhub
       pkgs.vrc-get
       pkgs.openseeface
+      pkgs.fspy
 
       # pkgs.gimp
     ];

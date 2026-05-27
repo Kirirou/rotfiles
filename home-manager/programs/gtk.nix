@@ -84,7 +84,6 @@ in
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;
     };
-    # gtk4.extraCss = builtins.readFile "${pkgs.gruvbox-gtk-theme}/share/themes/Gruvbox-Dark/gtk-4.0/gtk.css";
   };
 
   # write theme accents into nix.json for rust to read

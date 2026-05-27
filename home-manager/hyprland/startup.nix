@@ -56,8 +56,8 @@ in {
       "hyprctl dispatch workspace 1"
       "hyprctl dispatch workspace 4"
 
-      "swww-daemon &"
-      "swww img ~/Pictures/Wallpapers/nix-wide.png &"
+      "awww-daemon &"
+      "awww img ~/Pictures/Wallpapers/nix-wide.png &"
       # "mpvpaper -s -o \"no-audio loop\" DP-3 ~/Videos/timelapce_bw.mp40001-1087.mkv &"
       "wallust theme base16-embers &"
       "waybar &"
