@@ -35,6 +35,7 @@
       umoria
       inputs.wfetch.packages.${pkgs.stdenv.hostPlatform.system}.wfetch
       inputs.ie-r.packages.${pkgs.stdenv.hostPlatform.system}.default # instant color eyedropper
+      inputs.late-sh.packages.${pkgs.stdenv.hostPlatform.system}.late
       # custom.wl_shimeji
       (pkgs.writeShellApplication {
         name = "bbb";

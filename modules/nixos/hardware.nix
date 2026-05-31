@@ -33,12 +33,12 @@
       };
       ssid = lib.mkOption {
         type = lib.types.str;
-        default = "RotWiFi";
+        default = "Farmtasker";
         description = "Hotspot name";
       };
       passphrase = lib.mkOption {
         type = lib.types.str;
-        default = "AAAzzz123123";
+        default = "6795CA70";
         description = "Hotspot password";
       };
     };

@@ -2,6 +2,7 @@
   pkgs,
   config,
   lib,
+  user,
   ...
 }:
 {
@@ -179,6 +180,7 @@
 
           jdk25
 
+          android-tools
           poppler-utils
           cups-pdf-to-pdf
           sane-airscan

@@ -2,6 +2,7 @@
   config,
   pkgs,
   user,
+  lib,
   ...
 }: {
   config = {
@@ -56,6 +57,15 @@
       QT_IM_MODULE = "fcitx";
       XMODIFIERS = "@im=fcitx";
       GLFW_IM_MODULE = "fcitx";
+
+      GST_PLUGIN_SYSTEM_PATH_1_0 = lib.makeSearchPath "lib/gstreamer-1.0" (with pkgs.gst_all_1; [
+        gstreamer.out
+        gst-plugins-base
+        gst-plugins-good
+        (gst-plugins-bad.override { lv2 = null; })
+        gst-plugins-ugly
+        gst-libav
+      ]);
     };
   };
 }
