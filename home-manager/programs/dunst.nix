@@ -33,7 +33,6 @@ in
         separator_color = "{{color7}}";
         separator_height = 1;
         show_indicators = "no";
-        inherit (config.services.dunst.settings.global) icon_path;
       };
 
       urgency_critical = {

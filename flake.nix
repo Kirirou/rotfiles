@@ -63,6 +63,8 @@
     };
 
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+
+    dzgui.url = "github:jiriks74/dzgui.flake";
   };
 
   # flake-utils is unnecessary
