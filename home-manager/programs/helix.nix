@@ -20,7 +20,6 @@ in
       pkgs.clang-tools
       tex
       # pkgs.texlive.combined.scheme-full
-      pkgs.texlivePackages.cyrillic
       pkgs.texlivePackages.tex-gyre
       pkgs.texlab
       pkgs.pandoc

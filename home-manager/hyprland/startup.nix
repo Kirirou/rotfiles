@@ -56,6 +56,7 @@ in {
       "hyprctl dispatch workspace 1"
       "hyprctl dispatch workspace 4"
 
+      "${lib.getExe pkgs.swaybg} -c '#383539' &"
       # "mpvpaper -s -o \"no-audio loop\" DP-3 ~/Videos/timelapce_bw.mp40001-1087.mkv &"
       "wallust theme base16-embers &"
       "waybar &"

@@ -162,14 +162,13 @@ in {
       };
 
       dwindle = {
-        pseudotile = true;
         preserve_split = true;
         force_split = 2;
       };
 
       master = {
-        new_on_active = false;
-        mfact = "0.5";
+        new_on_active = "none";
+        mfact = 0.5;
         orientation = "left";
         smart_resizing = true;
       };

@@ -51,6 +51,8 @@ in {
       home.directories = [
         ".cache/mozilla"
         ".mozilla"
+        ".config/firefox"
+        ".config/librewolf"
         ".librewolf"
         ".cache/librewolf"
       ];
