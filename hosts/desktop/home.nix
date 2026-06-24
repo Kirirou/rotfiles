@@ -112,7 +112,7 @@
 
     persist = {
       home.files = [ ".config/kritarc" ".config/kritadisplayrc" ];
-      home.directories = [ ".config/PureRef" ".config/dztui" ".local/share/Anki2" ];
+      home.directories = [ ".config/PureRef" ".config/dztui" ".local/share/Anki2" ".config/teams-for-linux" ];
     };
   };
   home = {

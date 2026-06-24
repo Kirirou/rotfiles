@@ -56,6 +56,9 @@
       ".local/share/easyeffects"
       ".config/easyeffects"
     ];
+    environment.sessionVariables = {
+      LD_LIBRARY_PATH = [ "${pkgs.pipewire.jack}/lib" ];
+    };
     environment.systemPackages = with pkgs; [
       sox
       alsa-lib
@@ -66,9 +69,10 @@
       pulseaudio
       qjackctl
       qpwgraph
-      vmpk # piano
+      vmpk
       rnnoise
       rnnoise-plugin
+      pipewire.jack
     ];
     # easyeffects rnnoise preset
     hm.home.file.".config/easyeffects/input/rnnoise.json".text = builtins.toJSON {
