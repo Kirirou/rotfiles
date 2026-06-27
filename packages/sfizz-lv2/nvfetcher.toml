@@ -1,5 +1,0 @@
-[sfizz-lv2]
-src.git = "https://github.com/sfztools/sfizz-ui.git"
-fetch.git = "https://github.com/sfztools/sfizz-ui.git"
-git.fetchSubmodules = true
-git.deepClone = true

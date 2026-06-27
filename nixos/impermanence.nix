@@ -60,6 +60,7 @@ in
           "nt"
           ".cache/dconf"
           ".config/dconf"
+          ".config/SysMocap"
         ] ++ cfg.home.directories ++ hmPersistCfg.home.directories;
       };
     };

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nix search *)",
+      "Bash(nix build *)",
+      "Read(//nix/store/9xhy9gfmdkfsjaldfp4hfkm6ag90vy4h-qjackctl-1.0.6/bin/**)",
+      "Read(//nix/store/9xhy9gfmdkfsjaldfp4hfkm6ag90vy4h-qjackctl-1.0.6/**)",
+      "Bash(ldd /nix/store/9xhy9gfmdkfsjaldfp4hfkm6ag90vy4h-qjackctl-1.0.6/bin/.qjackctl-wrapped)",
+      "Bash(readelf -d /nix/store/9xhy9gfmdkfsjaldfp4hfkm6ag90vy4h-qjackctl-1.0.6/bin/.qjackctl-wrapped)"
+    ]
+  }
+}

@@ -65,6 +65,9 @@
         # mcomix
         # yacreader
         musescore
+
+        nodejs
+        custom.sysmocap
       ]
       ++ (lib.optional config.custom.helix.enable helix)
       # home-manager executable only on non-nixos

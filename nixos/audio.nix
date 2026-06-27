@@ -51,14 +51,18 @@
     users.users.${user} = {
       extraGroups = ["jackaudio" "audio" ];
     };
+    hm.systemd.user.sessionVariables = {
+      LD_LIBRARY_PATH = "${pkgs.pipewire.jack}/lib";
+    };
+    hm.wayland.windowManager.hyprland.settings.env = [
+      "LD_LIBRARY_PATH,${pkgs.pipewire.jack}/lib"
+    ];
+
     custom.persist.home.directories = [
       ".config/rncbc.org"
       ".local/share/easyeffects"
       ".config/easyeffects"
     ];
-    environment.sessionVariables = {
-      LD_LIBRARY_PATH = [ "${pkgs.pipewire.jack}/lib" ];
-    };
     environment.systemPackages = with pkgs; [
       sox
       alsa-lib

@@ -1,0 +1,23 @@
+{
+    "sysmocap": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "sysmocap",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "xianfei",
+            "repo": "SysMocap",
+            "rev": "v0.8.0",
+            "sha256": "sha256-v1sY6c9rda4crD4+EyNrezCm0fUuVt14cJluYKITS+c=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.8.0"
+    }
+}

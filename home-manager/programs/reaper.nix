@@ -60,7 +60,7 @@ config = lib.mkIf config.custom.reaper.enable {
 
       # pkgs.decent-sampler
       pkgs.custom.decent-sampler-dynamic
-      pkgs.custom.sfizz-lv2
+
       # LIB
       # -------
       pkgs.expat
