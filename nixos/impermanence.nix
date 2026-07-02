@@ -61,6 +61,7 @@ in
           ".cache/dconf"
           ".config/dconf"
           ".config/SysMocap"
+          ".config/devauth"
         ] ++ cfg.home.directories ++ hmPersistCfg.home.directories;
       };
     };
