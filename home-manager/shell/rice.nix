@@ -17,6 +17,7 @@
       bastet
       cbonsai
       cmatrix
+      custom.csakura
       hollywood
       fastfetch
       cpufetch

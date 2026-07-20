@@ -68,7 +68,7 @@ in {
         "file://${wdc-data-mountpoint}/_MAIN/ _MAIN"
         "file://${wdc-data-mountpoint}/_SMALL/ _SMALL"
         "file://${wdc-data-mountpoint}/_MAIN/_NT_STUDIO/ _NT_STUDIO"
-        "file://${wdc-data-mountpoint}/_ONLINE_TANK/ _ONLINE_TANK"
+        "file://${wdc-data-mountpoint}/_MAIN/REAPER REAPER"
 
         "file://${wdc-okii-mountpoint}/_ANIME/ _ANIME"
         "file://${wdc-okii-mountpoint}/_FILM/ _FILM"

@@ -28,4 +28,6 @@ decent-sampler-dynamic = w pkgs.callPackage ./decent-sampler-dynamic { };
 
   sysmocap = w pkgs.callPackage ./sysmocap { };
 
+  csakura = w pkgs.callPackage ./csakura { };
+
 }

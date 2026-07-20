@@ -30,7 +30,7 @@
     monero.enable = true;
     wine.enable = true;
     distrobox.enable = false;
-    jellyfin.enable = true;
+    jellyfin.enable = false;
     pr_managment.enable = true;
     nginx.enable = true;
     llm.enable = true;

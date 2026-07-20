@@ -47,6 +47,7 @@
     ./input.nix
     ./bluetooth.nix
     ./hotspot.nix
+    ./vpn.nix
   ];
 
   config = {

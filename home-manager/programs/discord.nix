@@ -40,10 +40,15 @@
     ];
 
     custom.persist = {
+      home.files = [
+        ".config/zoomus.conf"
+        ".config/zoom.conf"
+      ];
       home.directories = [
         ".config/discord"
         ".config/vesktop"
         ".config/VencordDesktop"
+        ".zoom"
       ];
     };
   };
