@@ -44,9 +44,9 @@
     "boot.shell_on_fail"
     "acpi_backlight=vendor"
     "video.use_native_backlight=1"
-    "isolcpus=5"
-    "nohz_full=5"
-    "rcu_nocbs=5"
+    "isolcpus=4-5"
+    "nohz_full=4-5"
+    "rcu_nocbs=4-5"
     "threadirqs"
   ];
   boot.tmp.useTmpfs = true;
@@ -90,6 +90,7 @@
   };
 
 
+  hardware.i2c.enable = true;
   hardware.openrazer.enable = true;
   environment.systemPackages = with pkgs; [
       polychromatic

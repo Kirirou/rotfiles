@@ -1,6 +1,5 @@
 {
   config,
-  isNixOS,
   lib,
   pkgs,
   ...
@@ -29,7 +28,7 @@
         "mimeapps.list".force = true;
       }
       # other OSes seem to override this file
-      // lib.mkIf (!isNixOS) { "gtk-3.0/bookmarks".force = true; };
+      ;
   };
 
   gtk.gtk3.bookmarks =

@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  isNixOS,
   pkgs,
   ...
 }:
@@ -10,7 +9,7 @@ let
 in
 lib.mkIf cfg.enable {
   programs.waybar = {
-    enable = isNixOS;
+    enable = true;
     # do not use the systemd service as it is flaky and unreliable
     # https://github.com/nix-community/home-manager/issues/3599
   };

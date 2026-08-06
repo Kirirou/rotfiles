@@ -76,6 +76,7 @@
       pkgs = import inputs.nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        config.allowBroken = true;
         config.permittedInsecurePackages = [ "fspy-1.0.3" ];
       };
       pkgs-stable = import inputs.nixpkgs-stable {

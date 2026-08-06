@@ -1,6 +1,5 @@
 {
   config,
-  isNixOS,
   lib,
   pkgs,
   inputs,

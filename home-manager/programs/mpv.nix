@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  isNixOS,
   ...
 }: {
   xdg.configFile = {
@@ -26,7 +25,7 @@
 
   programs.mpv = lib.mkMerge [
     {
-      enable = isNixOS;
+      enable = true;
       bindings = {
         MBTN_LEFT = "cycle pause";
         WHEEL_UP = "ignore";

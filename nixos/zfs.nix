@@ -24,6 +24,8 @@ in
     };
   };
 
+  systemd.services."zfs-import-wdc-blue".serviceConfig.TimeoutStartSec = "30";
+
   services.zfs = {
     autoScrub.enable = true;
     trim.enable = true;

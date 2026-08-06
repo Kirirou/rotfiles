@@ -102,6 +102,10 @@
     environment.sessionVariables =
       {
         NIXOS_OZONE_WL = "1";
+        MOZ_ENABLE_WAYLAND = "1";
+        NVD_BACKEND = "direct";
+        LIBVA_DRM_DEVICE = "/dev/dri/renderD128";
+        MOZ_DISABLE_RDD_SANDBOX = "1";
       }
       // lib.optionalAttrs config.programs.hyprland.enable {
         LIBVA_DRIVER_NAME = "nvidia";

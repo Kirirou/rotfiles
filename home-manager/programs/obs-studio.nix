@@ -12,6 +12,12 @@ in {
     ];
     programs.obs-studio = {
       enable = true;
+      package = pkgs.obs-studio.overrideAttrs (old: {
+        postFixup = (old.postFixup or "") + ''
+          wrapProgram $out/bin/obs \
+            --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib
+        '';
+      });
 
       plugins = with pkgs.obs-studio-plugins; [
         wlrobs                    # Screencast capture for Wayland compositors [https://github.com/CatxFish/wlrobs]

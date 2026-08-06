@@ -48,7 +48,7 @@
           fi
 
           for i in $(seq 1 5); do
-            sudo ddcutil --display "$i" setvcp 10 "$1"
+            ddcutil --display "$i" setvcp 10 "$1"
           done
         '';
       })

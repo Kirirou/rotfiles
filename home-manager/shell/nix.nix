@@ -1,7 +1,6 @@
 {
   config,
   host,
-  isNixOS,
   lib,
   pkgs,
   ...
@@ -13,7 +12,7 @@ in {
       nh
       nil
       nix-output-monitor
-      nixfmt-rfc-style
+      nixfmt
       nvfetcher
     ];
 
@@ -53,16 +52,7 @@ in {
         ripgrep
         custom.shell.nix-current-generation
       ];
-      text = let
-        subcmd =
-          if isNixOS
-          then "os"
-          else "home";
-        hostFlag =
-          if isNixOS
-          then "hostname"
-          else "configuration";
-      in ''
+      text = ''
         sudo -l &>/dev/null
         cd ${rots}
 
@@ -75,20 +65,17 @@ in {
         fi
 
         # force switch to always use current host
-        if [[ "$*" == *"--${hostFlag}"* ]]; then
-            # Replace the word after "--${hostFlag}" with host using parameter expansion
-            cleaned_args=("''${@/--${hostFlag} [^[:space:]]*/--${hostFlag} ${host}}")
-            nh ${subcmd} switch "''${cleaned_args[@]}" ${rots} -- --option eval-cache false
+        if [[ "$*" == *"--hostname"* ]]; then
+            cleaned_args=("''${@/--hostname [^[:space:]]*/--hostname ${host}}")
+            nh os switch "''${cleaned_args[@]}" ${rots} -- --option eval-cache false
         else
-            nh ${subcmd} switch "$@" --${hostFlag} ${host} ${rots} -- --option eval-cache false
+            nh os switch "$@" --hostname ${host} ${rots} -- --option eval-cache false
         fi
 
-        ${lib.optionalString isNixOS ''
-          # only relevant if --dry is not passed
-          if [[ "$*" != *"--dry"* ]]; then
-            echo -e "Switched to Generation \033[1m$(nix-current-generation)\033[0m"
-          fi
-        ''}
+        # only relevant if --dry is not passed
+        if [[ "$*" != *"--dry"* ]]; then
+          echo -e "Switched to Generation \033[1m$(nix-current-generation)\033[0m"
+        fi
         cd - > /dev/null
       '';
     };
@@ -101,16 +88,7 @@ in {
         ripgrep
         custom.shell.nix-current-generation
       ];
-      text = let
-        subcmd =
-          if isNixOS
-          then "os"
-          else "home";
-        hostFlag =
-          if isNixOS
-          then "hostname"
-          else "configuration";
-      in ''
+      text = ''
         cd ${rots}
 
         # stop bothering me about untracked files
@@ -122,20 +100,17 @@ in {
         fi
 
         # force test to always use current host
-        if [[ "$*" == *"--${hostFlag}"* ]]; then
-            # Replace the word after "--${hostFlag}" with host using parameter expansion
-            cleaned_args=("''${@/--${hostFlag} [^[:space:]]*/--${hostFlag} ${host}}")
-            nh ${subcmd} test "''${cleaned_args[@]}" ${rots} -- --option eval-cache false
+        if [[ "$*" == *"--hostname"* ]]; then
+            cleaned_args=("''${@/--hostname [^[:space:]]*/--hostname ${host}}")
+            nh os test "''${cleaned_args[@]}" ${rots} -- --option eval-cache false
         else
-            nh ${subcmd} test "$@" --${hostFlag} ${host} ${rots} -- --option eval-cache false
+            nh os test "$@" --hostname ${host} ${rots} -- --option eval-cache false
         fi
 
-        ${lib.optionalString isNixOS ''
-          # only relevant if --dry is not passed
-          if [[ "$*" != *"--dry"* ]]; then
-            echo -e "tested to Generation \033[1m$(nix-current-generation)\033[0m"
-          fi
-        ''}
+        # only relevant if --dry is not passed
+        if [[ "$*" != *"--dry"* ]]; then
+          echo -e "tested to Generation \033[1m$(nix-current-generation)\033[0m"
+        fi
         cd - > /dev/null
       '';
     };
@@ -314,7 +289,7 @@ in {
       name = "json2nix";
       runtimeInputs = with pkgs; [
         hjson
-        nixfmt-rfc-style
+        nixfmt
       ];
       text = ''
         json=$(cat - | hjson -j 2> /dev/null)
@@ -325,7 +300,7 @@ in {
       name = "yaml2nix";
       runtimeInputs = with pkgs; [
         yq
-        nixfmt-rfc-style
+        nixfmt
       ];
       text = ''
         yaml=$(cat - | yq)

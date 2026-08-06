@@ -6,15 +6,8 @@
 inputs.devenv.lib.mkShell {
   inherit inputs;
 
-  # use nixfmt-rfc-style for nixfmt
   pkgs = import inputs.nixpkgs {
     inherit system;
-    overlays = [
-      (_: prev: {
-        # need gtk support for opencv to show the preview window
-        nixfmt = prev.nixfmt-rfc-style;
-      })
-    ];
   };
 
   modules = [

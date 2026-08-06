@@ -114,7 +114,7 @@ in {
       # "L+ /home/${user}/_SMALL/_MUSIC                  - - - - ${wdc-data-mountpoint}/_MUSIC"
       # "L+ /home/${user}/_SMALL/_FILM                   - - - - ${wdc-data-mountpoint}/_FILM"
       # "L+ /home/${user}/_SMALL/_ANIME                  - - - - ${wdc-data-mountpoint}/_ANIME"
-      "L+ /home/${user}/tn                  - - - - ${wdc-data-mountpoint}/_ONLINE_TANK"
+      # "L+ /home/${user}/tn                  - - - - ${wdc-data-mountpoint}/_ONLINE_TANK"
     ];
 
     # dual boot windows

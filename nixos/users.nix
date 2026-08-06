@@ -33,12 +33,12 @@
         # mkpasswd -m sha-512 'PASSWORD' | sudo tee -a /persist/etc/shadow/root
         users = {
           root = {
-            initialPassword = "password";
+            initialPassword = lib.mkIf (!config.custom.sops.enable) "password";
             hashedPasswordFile = "/persist/etc/shadow/root";
           };
           ${user} = {
             isNormalUser = true;
-            initialPassword = "password";
+            initialPassword = lib.mkIf (!config.custom.sops.enable) "password";
             hashedPasswordFile = "/persist/etc/shadow/${user}";
             linger = true;
             extraGroups = [

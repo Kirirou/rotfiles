@@ -6,7 +6,7 @@
   # boot.resumeDevice = "/dev/disk/by-label/SWAP";
   boot.kernelParams = ["mem_sleep_default=deep"];
 
-  boot.zfs.allowHibernation = true;
+  boot.zfs.unsafeAllowHibernation = true;
   boot.zfs.forceImportRoot = false;
 
   systemd.targets = {

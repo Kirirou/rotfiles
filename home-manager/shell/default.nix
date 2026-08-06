@@ -59,6 +59,7 @@
     linuxConsoleTools
     patchelf
     daemonize
+    lftp
 
     cmus
     devenv

@@ -28,7 +28,8 @@ in {
     networking.nameservers = [ "192.168.1.1" ];
 
     networking.networkmanager.unmanaged = [ cfg.wifi_iface ];
-    networking.wireless.interfaces = lib.mkForce [];
+    # NetworkManager handles wifi; disable wpa_supplicant to avoid conflict with hostapd
+    networking.wireless.enable = lib.mkForce false;
 
     services.hostapd = {
       enable = true;

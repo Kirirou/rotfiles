@@ -43,6 +43,7 @@ in {
       # inputs.hyprgrass.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
 
+    wayland.windowManager.hyprland.configType = "hyprlang";
     wayland.windowManager.hyprland.importantPrefixes = [ "output" ];
     wayland.windowManager.hyprland.settings = {
       # monitor = (lib.forEach displays
@@ -176,6 +177,7 @@ in {
       binds = { workspace_back_and_forth = false; };
 
       misc = {
+        vrr = 1;
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
         force_default_wallpaper = 0;
@@ -214,7 +216,8 @@ in {
         "match:fullscreen 1, border_size 5"            # monocle mode
         "match:class wlroots, float on"                # hyprland debug session
         "match:class Waydroid, float on"
-        "match:class QjackCtl, float on"
+        "match:class (?i)qjackctl, float on"
+        "match:class (?i)qjackctl, size 40% 20%"
         "match:class ayaka-gui, float on"
         "match:class org.fcitx., float on"
         "match:class fl64.exe, float on"

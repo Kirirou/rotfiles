@@ -15,6 +15,7 @@ in {
       firefox = {
         enable = true;
         package = firefoxPkg;
+        configPath = ".mozilla/firefox";
 
         profiles.${user} = {
           # TODO: define keyword searches here?

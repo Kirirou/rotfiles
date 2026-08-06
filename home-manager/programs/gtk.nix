@@ -2,7 +2,6 @@
   pkgs,
   config,
   lib,
-  isNixOS,
   ...
 }:
 let
@@ -26,7 +25,7 @@ let
 in
 {
   home = {
-    pointerCursor = lib.mkIf isNixOS {
+    pointerCursor = {
       package = pkgs.simp1e-cursors;
       name = "Simp1e-Gruvbox-Dark";
       size = 28;
@@ -80,6 +79,7 @@ in
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;
     };
+    gtk4.theme = config.gtk.theme;
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;

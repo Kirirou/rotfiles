@@ -1,4 +1,4 @@
-{ pkgs, lib, isNixOS, ... }: {
+{ pkgs, lib, ... }: {
   custom = {
     wifi.enable = true;
     battery.enable = true;
@@ -64,11 +64,11 @@
   };
 
   home = {
-    packages = lib.mkIf isNixOS (with pkgs; [
+    packages = with pkgs; [
       # gimp
       # kdenlive
       shotcut
       ffmpeg
-    ]);
+    ];
   };
 }

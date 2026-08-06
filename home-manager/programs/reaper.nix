@@ -14,6 +14,7 @@ config = lib.mkIf config.custom.reaper.enable {
       pkgs.reaper
       pkgs.reaper-sws-extension
       pkgs.reaper-reapack-extension
+      pkgs.labwc
 
       # PLUGINS:
       # --------
@@ -35,13 +36,13 @@ config = lib.mkIf config.custom.reaper.enable {
       pkgs.swh_lv2
       pkgs.neural-amp-modeler-lv2
       # pkgs.tunefish
-      pkgs.soundfont-generaluser
+      pkgs.soundfont-generaluser-gs
       pkgs.soundfont-ydp-grand
       pkgs.noise-repellent
       pkgs.speech-denoiser
       pkgs.mod-distortion
       pkgs.midi-trigger
-      pkgs.sfizz
+      pkgs.sfizz-ui
       pkgs.carla
       # pkgs.distrho
       pkgs.bshapr

@@ -1,4 +1,4 @@
-{ pkgs, lib, inputs, isNixOS, ... }: {
+{ pkgs, lib, inputs, ... }: {
   custom = {
     kbLayout = "jp";
     wifi.enable = true;
@@ -112,15 +112,15 @@
 
     persist = {
       home.files = [ ".config/kritarc" ".config/kritadisplayrc" ];
-      home.directories = [ ".config/PureRef" ".config/dztui" ".local/share/Anki2" ".config/teams-for-linux" ];
+      home.directories = [ ".config/PureRef" ".config/dztui" ".local/share/Anki2" ".config/teams-for-linux" ".config/inkscape" ];
     };
   };
   home = {
-    packages = lib.mkIf isNixOS (with pkgs; [
+    packages = with pkgs; [
       krita inkscape anki
       teamspeak6-client
       guvcview
       inputs.dzgui.packages.${pkgs.stdenv.hostPlatform.system}.dzgui
-    ]);
+    ];
   };
 }

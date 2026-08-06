@@ -3,7 +3,6 @@
   pkgs,
   lib,
   config,
-  isNixOS,
   ...
 }:
 {
@@ -31,7 +30,7 @@
     stateVersion = "23.05";
 
     sessionVariables = {
-      __IS_NIXOS = if isNixOS then "1" else "0";
+      __IS_NIXOS = "1";
       NIXPKGS_ALLOW_UNFREE = "1";
     };
     
@@ -70,24 +69,13 @@
         custom.sysmocap
       ]
       ++ (lib.optional config.custom.helix.enable helix)
-      # home-manager executable only on non-nixos
-      ++ (lib.optional isNixOS home-manager)
+      ++ [ home-manager ]
       # handle fonts
       ++ config.custom.fonts.packages
       # add custom user created shell packages
       ++ (lib.attrValues config.custom.shell.finalPackages);
   };
 
-  nixpkgs.config.allowBroken = true;
-
-  # add custom user created shell packages to pkgs.custom.shell
-  nixpkgs.overlays = lib.mkIf (!isNixOS) [
-    (_: prev: {
-      custom = prev.custom // {
-        shell = config.custom.shell.finalPackages;
-      };
-    })
-  ];
 
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
@@ -96,6 +84,7 @@
   xdg = {
     enable = true;
     userDirs.enable = true;
+    userDirs.setSessionVariables = true;
     mimeApps.enable = true;
     mimeApps.defaultApplications = {
       "application/pdf" = [ "org.pwmt.zathura.desktop" ];

@@ -1,7 +1,6 @@
 {
   config,
   host,
-  isNixOS,
   lib,
   pkgs,
   user,
@@ -111,7 +110,7 @@ lib.mkMerge [
       };
     };
   })
-  (lib.mkIf isNixOS { home.packages = [ pkgs.awww pkgs.swaybg ]; })
+  { home.packages = [ pkgs.awww pkgs.swaybg ]; }
   {
     home.shellAliases = {
       current-wallpaper = "command cat $XDG_RUNTIME_DIR/current_wallpaper";

@@ -56,6 +56,8 @@
     # services.devmon.enable = true;
     programs.dconf.enable = true;
 
+    services.teamviewer.enable = true;
+
     environment = {
       etc = {
         # universal git settings
