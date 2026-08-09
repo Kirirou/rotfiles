@@ -44,7 +44,6 @@ lib.mkIf config.custom.llm.enable {
     # ollama-cuda
     # shell-gpt
     # llm
-    aichat
 
   ] ++ additionalPackages;
   # setup port forwarding
@@ -126,7 +125,6 @@ lib.mkIf config.custom.llm.enable {
   custom.persist = {
     home.directories = [
       ".ollama"
-      ".config/aichat"
       ".claude"
       ".cache/whisper"
     ];

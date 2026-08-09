@@ -7,8 +7,6 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
-    copyparty.url = "github:9001/copyparty";
-
     late-sh = {
       url = "github:mpiorowski/late-sh";
       inputs.nixpkgs.follows = "nixpkgs";

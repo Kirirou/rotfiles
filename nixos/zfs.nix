@@ -83,6 +83,20 @@ in
       [ -z "$SNAPSHOT" ] && exit 1
       sudo zfs rollback -r "$SNAPSHOT"
     '')
+    (pkgs.writeShellScriptBin "zfs-rm-snapshot" ''
+      while true; do
+        SNAPSHOT=$(zfs list -t snapshot -r zroot/persist | awk '{print $1}' | tail -n +2 | ${pkgs.fzf}/bin/fzf --header="Select snapshot to destroy (^C to quit)")
+        [ -z "$SNAPSHOT" ] && continue
+
+        read -r -p "Destroy $SNAPSHOT? [y/N] " confirm1
+        [ "$confirm1" != "y" ] && [ "$confirm1" != "Y" ] && echo "Cancelled." && continue
+
+        read -r -p "Are you sure? This is irreversible. [y/N] " confirm2
+        [ "$confirm2" != "y" ] && [ "$confirm2" != "Y" ] && echo "Cancelled." && continue
+
+        sudo zfs destroy "$SNAPSHOT" && echo "Destroyed $SNAPSHOT."
+      done
+    '')
   ];
 
   services.sanoid = lib.mkIf cfg.snapshots {

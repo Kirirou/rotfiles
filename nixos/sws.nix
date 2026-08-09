@@ -20,8 +20,6 @@ in lib.mkMerge [
   networking.firewall.allowedTCPPorts = [ 80 443 3210 3211 ];
   networking.firewall.allowedUDPPorts = [ 80 443 3210 3211 ];
 
-  environment.systemPackages = [ pkgs.copyparty ];
-
   services.onedrive.enable = true;
 
   custom.persist = {

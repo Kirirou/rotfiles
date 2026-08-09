@@ -55,15 +55,13 @@ in
     };
   };
 
-  home.sessionVariables.GTK_THEME = "Gruvbox-Dark";
-
-  home.packages = [ pkgs.gtk-engine-murrine ];
+  home.sessionVariables.GTK_THEME = "gruvbox-dark";
 
   gtk = {
     enable = true;
     theme = {
-      name = "Gruvbox-Dark";
-      package = pkgs.gruvbox-gtk-theme;
+      name = "gruvbox-dark";
+      package = pkgs.gruvbox-dark-gtk;
     };
     iconTheme = {
       name = "oomox-gruvbox-dark";

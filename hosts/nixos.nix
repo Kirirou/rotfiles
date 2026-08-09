@@ -24,7 +24,6 @@
         ../nixos
         ../modules/nixos
         ../overlays
-        inputs.copyparty.nixosModules.default
         inputs.musnix.nixosModules.musnix
         inputs.home-manager.nixosModules.home-manager
         inputs.nix-minecraft.nixosModules.minecraft-servers # MINECRAFT SERVERS

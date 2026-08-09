@@ -1,8 +1,8 @@
-{...}: {
+{ pkgs, ... }: {
   programs.zellij = {
     enable = true;
     enableBashIntegration = false;
-    enableFishIntegration = true;
+    enableFishIntegration = false;
     settings = {
       theme = "gruvbox-dark";
       on_force_close = "detach";
@@ -22,6 +22,26 @@
     };
   };
   xdg.configFile."zellij/v2h.swap.kdl".source = ./v2h.swap.kdl;
+
+  systemd.user.services.zellij = {
+    Unit = {
+      Description = "Zellij session";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.zellij}/bin/zellij attach --create-background main";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
+  programs.fish.interactiveShellInit = ''
+    if test -z "$ZELLIJ"
+      exec zellij attach --create main
+    end
+  '';
 
   programs.tmux = {
     enable = true;

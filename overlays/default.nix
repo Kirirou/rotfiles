@@ -74,6 +74,5 @@ in {
 
     })
     inputs.nix-minecraft.overlay
-    inputs.copyparty.overlays.default
   ];
 }
