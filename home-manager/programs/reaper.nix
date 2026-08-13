@@ -114,39 +114,25 @@ config = lib.mkIf config.custom.reaper.enable {
     # q w e r t y   → ARM ON   (tracks 1–6)
     # a s d f g h   → ARM OFF  (tracks 1–6)
 
-    wayland.windowManager.hyprland.settings.bind = [
-      "SUPER_SHIFT, z, exec, play -n synth 0.1 sine 300 vol 0.3"
-      "SUPER_SHIFT, z, submap, reaper"
-    ];
     wayland.windowManager.hyprland.extraConfig = ''
-        submap = reaper
-          bind = , z, exec, play -n synth 0.1 sine 200 vol 0.3
-          bind = , z, submap, reset
-
-          # bind = , 1, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/1/mute/toggle
-          # bind = , 2, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/2/mute/toggle
-          # bind = , 3, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/3/mute/toggle
-          # bind = , 4, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/4/mute/toggle
-          # bind = , 5, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/5/mute/toggle
-          # bind = , 6, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/6/mute/toggle
-
-          # ARM ON (upper row)
-          bind = , q, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/1/recarm i 1
-          bind = , w, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/2/recarm i 1
-          bind = , e, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/3/recarm i 1
-          bind = , r, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/4/recarm i 1
-          bind = , t, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/5/recarm i 1
-          bind = , y, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/6/recarm i 1
-
-          # ARM OFF (lower row)
-          bind = , a, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/1/recarm i 0
-          bind = , s, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/2/recarm i 0
-          bind = , d, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/3/recarm i 0
-          bind = , f, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/4/recarm i 0
-          bind = , g, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/5/recarm i 0
-          bind = , h, exec, ${pkgs.liblo}/bin/oscsend localhost 9800 /track/6/recarm i 0
-
-        submap = reset
+      hl.bind("SUPER + SHIFT + z", hl.dsp.exec_cmd("play -n synth 0.1 sine 300 vol 0.3"))
+      hl.bind("SUPER + SHIFT + z", hl.dsp.submap("reaper"))
+      hl.define_submap("reaper", function()
+        hl.bind("z", hl.dsp.exec_cmd("play -n synth 0.1 sine 200 vol 0.3"))
+        hl.bind("z", hl.dsp.submap("reset"))
+        hl.bind("q", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/1/recarm i 1"))
+        hl.bind("w", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/2/recarm i 1"))
+        hl.bind("e", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/3/recarm i 1"))
+        hl.bind("r", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/4/recarm i 1"))
+        hl.bind("t", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/5/recarm i 1"))
+        hl.bind("y", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/6/recarm i 1"))
+        hl.bind("a", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/1/recarm i 0"))
+        hl.bind("s", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/2/recarm i 0"))
+        hl.bind("d", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/3/recarm i 0"))
+        hl.bind("f", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/4/recarm i 0"))
+        hl.bind("g", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/5/recarm i 0"))
+        hl.bind("h", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/6/recarm i 0"))
+      end)
     '';
 
     home.shellAliases = {

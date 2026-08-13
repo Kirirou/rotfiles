@@ -84,19 +84,14 @@ in
     '';
   };
 
-  # add blur for rofi shutdown
+  # add blur for rofi shutdown + force center on monitor
   wayland.windowManager.hyprland.settings = {
-    layerrule = [
-      "match:namespace rofi, blur on"
-      "match:namespace rofi, ignore_alpha 0"
+    layer_rule = [
+      { match.namespace = "rofi"; blur = true; ignore_alpha = 0; }
     ];
 
-
-    # force center rofi on monitor
-    windowrule = [
-      "match:class Rofi, float on"
-      "match:class Rofi, center on"
-      "match:class Rofi, rounding 12"
+    window_rule = [
+      { match.class = "Rofi"; float = true; center = true; rounding = 12; }
     ];
   };
 

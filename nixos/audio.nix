@@ -55,7 +55,7 @@
       LD_LIBRARY_PATH = "${pkgs.pipewire.jack}/lib";
     };
     hm.wayland.windowManager.hyprland.settings.env = [
-      "LD_LIBRARY_PATH,${pkgs.pipewire.jack}/lib"
+      { _args = ["LD_LIBRARY_PATH" "${pkgs.pipewire.jack}/lib"]; }
     ];
 
     custom.persist.home.directories = [

@@ -50,16 +50,11 @@ in {
       };
     };
 
-    wayland.windowManager.hyprland.settings = {
-      bind = [
-        # "SUPER, backslash, exec, grimblast --notify --freeze copy area"
-        # "SUPER_SHIFT, backslash, exec, hypr-screenshot"
-        # "SUPER_CTRL, backslash, exec, hypr-ocr"
-      "SUPER_SHIFT, backslash, exec, focal image --area selection --no-notify --no-save --no-rounded-windows"
-      "SUPER, backslash, exec, focal image --edit swappy --rofi --no-rounded-windows"
-      "SUPER_CTRL, backslash, exec, focal image --area selection --ocr"
-      ''ALT, backslash, exec, focal video --rofi --no-rounded-windows''
-      ];
-    };
+    wayland.windowManager.hyprland.extraConfig = ''
+      hl.bind("SUPER + SHIFT + backslash", hl.dsp.exec_cmd("focal image --area selection --no-notify --no-save --no-rounded-windows"))
+      hl.bind("SUPER + backslash", hl.dsp.exec_cmd("focal image --edit swappy --rofi --no-rounded-windows"))
+      hl.bind("SUPER + CTRL + backslash", hl.dsp.exec_cmd("focal image --area selection --ocr"))
+      hl.bind("ALT + backslash", hl.dsp.exec_cmd("focal video --rofi --no-rounded-windows"))
+    '';
   };
 }

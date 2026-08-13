@@ -15,10 +15,10 @@ lib.mkIf cfg.enable {
   };
 
   # toggle / launch waybar
-  wayland.windowManager.hyprland.settings.bind = [
-    "SUPER, v, exec, pkill waybar"
-    "SUPER_SHIFT, v, exec, waybar"
-  ];
+  wayland.windowManager.hyprland.extraConfig = ''
+    hl.bind("SUPER + v", hl.dsp.exec_cmd("pkill waybar"))
+    hl.bind("SUPER + SHIFT + v", hl.dsp.exec_cmd("waybar"))
+  '';
 
   custom = {
     shell.packages = {

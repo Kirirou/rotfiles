@@ -30,7 +30,6 @@
         display_name_output = "DP-3";
         mode = "5120x1440@144";
         position = "0x0";
-        addreserved = "0, 0, 0, 0,";
         scale = 1.0;
         transform = 0;
         workspace_names = [ "1" "2" "3" "q" "w" "e"];
@@ -40,7 +39,7 @@
         display_name_output = "DP-2";
         mode = "2560x1080@200";
         position = "2560x1440";
-        addreserved = "0, 0, 0, 600,";
+        reserved = { left = 600; };
         scale = 1.0;
         transform = 0;
         workspace_names = [ "a" "s" "d" "4" ];
@@ -50,7 +49,6 @@
         display_name_output = "HDMI-A-1";
         mode = "1920x1080@60";
         position = "0x1440";
-        addreserved = "0, 0, 0, 0,";
         scale = 1.0;
         transform = 0;
         workspace_names = [ "x" "c" ];

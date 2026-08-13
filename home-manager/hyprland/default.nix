@@ -43,203 +43,161 @@ in {
       # inputs.hyprgrass.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
 
-    wayland.windowManager.hyprland.configType = "hyprlang";
-    wayland.windowManager.hyprland.importantPrefixes = [ "output" ];
+    wayland.windowManager.hyprland.configType = "lua";
     wayland.windowManager.hyprland.settings = {
-      # monitor = (lib.forEach displays
-      #   ({ display_name, hyprland, ... }: "${display_name}, ${hyprland}"))
-      #   ++ (lib.optional (host != "desktop") ",preferred,auto,auto");
 
-      # monitorv2 = {
-      #   output = "DP-2";
-      #   mode = "3440x1440@200";
-      #   position = "0x0";
-      #   addreserved = "1600, 0, 0, 0";
-      #   scale = 1;
-      #   transform = 3;
-      # };
-
-      monitorv2 = (lib.forEach displays
-        ({display_name_output, mode, position, addreserved, scale, transform, ... }: {
-          output = display_name_output;
-          inherit mode position addreserved scale transform;
-        })
+      monitor = (lib.forEach displays
+        ({ display_name_output, mode ? "preferred", position ? "auto", reserved ? null, scale ? 1.0, transform ? 0, ... }:
+          { output = display_name_output; inherit mode position scale transform; }
+          // lib.optionalAttrs (reserved != null) { inherit reserved; }
+        )
       );
 
       env = [
-        "HYPRCURSOR_THEME,${config.home.pointerCursor.name}"
-        "HYPRCURSOR_SIZE,${toString config.home.pointerCursor.size}"
+        { _args = ["HYPRCURSOR_THEME" config.home.pointerCursor.name]; }
+        { _args = ["HYPRCURSOR_SIZE" (toString config.home.pointerCursor.size)]; }
       ];
 
-      input = {
-        sensitivity = config.custom.mouse_sensitivity;
-        kb_layout = config.custom.kbLayout;
-        follow_mouse = 1;
-        mouse_refocus = false;
-        accel_profile = "flat";
-        repeat_delay = 300;
+      config = {
+        input = {
+          sensitivity = config.custom.mouse_sensitivity;
+          kb_layout = config.custom.kbLayout;
+          follow_mouse = 1;
+          mouse_refocus = false;
+          accel_profile = "flat";
+          repeat_delay = 300;
 
-        # Set config.custom.display setting index to specify which monitor is a touchscreen device via host specific configuration
-        # touchdevice = lib.mkIf display.touchDevice.enabled {
-        #   enabled = true;
-        #   transform = display.touchDevice.transform;
-        #   output =
-        #     (lib.elemAt displays display.touchDevice.devIndex).display_name_output;
+          # Set config.custom.display setting index to specify which monitor is a touchscreen device via host specific configuration
+          # touchdevice = lib.mkIf display.touchDevice.enabled {
+          #   enabled = true;
+          #   transform = display.touchDevice.transform;
+          #   output =
+          #     (lib.elemAt displays display.touchDevice.devIndex).display_name_output;
+          # };
+
+          touchpad = {
+            natural_scroll = true;
+            disable_while_typing = true;
+            scroll_factor = 0.2;
+          };
+        };
+
+        # hyprgrass touchscreen plugin settings
+        # plugin.touch_gestures = {
+        #   sensitivity = 3.0;
+        #   workspace_swipe_fingers = 3;
+        #   workspace_swipe_edge = false;
+        #   long_press_delay = 400;
         # };
 
-        touchpad = {
-          natural_scroll = true;
-          disable_while_typing = true;
-          scroll_factor = 0.2;
-        };
-      };
-
-      # hyprgrass touchscreen plugin settings
-      # plugin.touch_gestures = {
-      # The default sensitivity is probably too low on tablet screens,
-      # I recommend turning it up to 4.0
-      # sensitivity = 3.0;
-
-      # must be >= 3
-      # workspace_swipe_fingers = 3;
-
-      # switching workspaces by swiping from an edge, this is separate from workspace_swipe_fingers
-      # and can be used at the same time
-      # possible values: l, r, u, or d
-      # to disable it set it to anything else
-      # workspace_swipe_edge = false;
-
-      # in milliseconds
-      # long_press_delay = 400;
-
-      # experimental {
-      #   # send proper cancel events to windows instead of hacky touch_up events,
-      #   # NOT recommended as it crashed a few times, once it's stabilized I'll make it the default
-      #   send_cancel = 0;
-      # }
-      # };
-
-      # "$mod" = config.custom.hyprland.modkey;
-
-      "$mainMod" = "SUPER";
-
-      "$term" = "${config.custom.terminal.exec}";
-
-      general = let gap = if host == "desktop" then 0 else 2;
-      in {
-        gaps_in = gap;
-        gaps_out = gap;
-        border_size = 3;
-        layout = "master";
-      };
-
-      
-
-      decoration = {
-        rounding = 0;
-        shadow = {
-          enabled = host != "vm";
-          range = 4;
-          render_power = 3;
-          color = "rgba(1a1a1aee)";
+        general = let gap = if host == "desktop" then 0 else 2;
+        in {
+          gaps_in = gap;
+          gaps_out = gap;
+          border_size = 3;
+          layout = "master";
         };
 
-        # dim_inactive = true
-        # dim_strength = 0.05
+        decoration = {
+          rounding = 0;
+          shadow = {
+            enabled = host != "vm";
+            range = 4;
+            render_power = 3;
+            color = "rgba(1a1a1aee)";
+          };
 
-        blur = {
-          # enabled = host != "vm";
+          # dim_inactive = true
+          # dim_strength = 0.05
+
+          blur = {
+            # enabled = host != "vm";
+            enabled = false;
+            size = 2;
+            passes = 3;
+            new_optimizations = true;
+          };
+        };
+
+        animations = {
           enabled = false;
-          size = 2;
-          passes = 3;
-          new_optimizations = true;
         };
 
-        # blurls = rofi
+        dwindle = {
+          preserve_split = true;
+          force_split = 2;
+        };
+
+        master = {
+          new_on_active = "none";
+          mfact = 0.5;
+          orientation = "left";
+          smart_resizing = true;
+        };
+
+        binds = { workspace_back_and_forth = false; };
+
+        misc = {
+          vrr = 1;
+          disable_hyprland_logo = true;
+          disable_splash_rendering = true;
+          force_default_wallpaper = 0;
+          mouse_move_enables_dpms = false;
+          animate_manual_resizes = true;
+          animate_mouse_windowdragging = true;
+          key_press_enables_dpms = true;
+          enable_swallow = false;
+          swallow_regex = "^([Kk]itty|[Ww]ezterm)$";
+          focus_on_activate = false;
+          background_color = "0x383539";
+        };
+
+        debug.disable_logs = false;
       };
-
-      animations = {
-        enabled = false;
-      };
-
-      dwindle = {
-        preserve_split = true;
-        force_split = 2;
-      };
-
-      master = {
-        new_on_active = "none";
-        mfact = 0.5;
-        orientation = "left";
-        smart_resizing = true;
-      };
-
-      binds = { workspace_back_and_forth = false; };
-
-      misc = {
-        vrr = 1;
-        disable_hyprland_logo = true;
-        disable_splash_rendering = true;
-        force_default_wallpaper = 0;
-        mouse_move_enables_dpms = false;
-        animate_manual_resizes = true;
-        animate_mouse_windowdragging = true;
-        key_press_enables_dpms = true;
-        enable_swallow = false;
-        swallow_regex = "^([Kk]itty|[Ww]ezterm)$";
-        focus_on_activate = false;
-        background_color = "0x383539";
-      };
-
-      debug.disable_logs = false;
 
       # bind workspaces to monitors
-      workspace = pkgs.custom.lib.mapWorkspaces
-        ({ workspace, monitor, workspace_name, ... }:
-          "${workspace}, monitor:${monitor}, defaultName:${workspace_name}")
+      workspace_rule = pkgs.custom.lib.mapWorkspaces
+        ({ workspace, monitor, workspace_name, ... }: {
+          workspace = toString workspace;
+          inherit monitor;
+          default_name = workspace_name;
+        })
         displays;
 
-      windowrule = [
-        # Shijima QT (still commented)
-        # "match:class Shijima-Qt, no_blur on"
-        # "match:class Shijima-Qt, decorate off"
+      window_rule = [
+        # { match.class = "Shijima-Qt"; no_blur = true; }
+        # { match.class = "Shijima-Qt"; decorate = false; }
+        # { match.class = "Shijima-Qt"; no_shadow = true; }
+        # { match.class = "Shijima-Qt"; float = true; }
+        # { match.class = "Shijima-Qt"; pin = true; }
 
-        # "match:class Shijima-Qt, no_shadow on"
-        # "match:class Shijima-Qt, float on"
-        # "match:class Shijima-Qt, no_dim on"
-        # "match:class Shijima-Qt, pin on"
-
-        # "match:floating 1, dim_around on"            # old dimaround
-
-        "match:class (.*menu.*), float on"
-        "match:class (.*Minecraft.*), float on"
-        "match:fullscreen 1, border_size 5"            # monocle mode
-        "match:class wlroots, float on"                # hyprland debug session
-        "match:class Waydroid, float on"
-        "match:class (?i)qjackctl, float on"
-        "match:class (?i)qjackctl, size 40% 20%"
-        "match:class ayaka-gui, float on"
-        "match:class org.fcitx., float on"
-        "match:class fl64.exe, float on"
-        "match:class blender, float on"
-        "match:class anki, float on"
-
-        "match:class SnekStudio, decorate off"
-
+        { match.class = "(.*menu.*)"; float = true; }
+        { match.class = "(.*Minecraft.*)"; float = true; }
+        { match.fullscreen = true; border_size = 5; }        # monocle mode
+        { match.class = "wlroots"; float = true; }           # hyprland debug session
+        { match.class = "Waydroid"; float = true; }
+        { match.class = "(?i)qjackctl"; float = true; size = "40% 20%"; }
+        { match.class = "ayaka-gui"; float = true; }
+        { match.class = "org.fcitx."; float = true; }
+        { match.class = "fl64.exe"; float = true; }
+        { match.class = "blender"; float = true; }
+        { match.class = "anki"; float = true; }
+        { match.class = "SnekStudio"; decorate = false; }
         # do not idle while watching videos
-        "match:class librewolf, idle_inhibit focus"
-        "match:class YouTube, idle_inhibit focus"
-        "match:class mpv, idle_inhibit focus"
-        "match:class REAPER, idle_inhibit focus"
-        # "match:class ^(REAPER)$, stay_focused on"
+        { match.class = "librewolf"; idle_inhibit = "focus"; }
+        { match.class = "YouTube"; idle_inhibit = "focus"; }
+        { match.class = "mpv"; idle_inhibit = "focus"; }
+        { match.class = "REAPER"; idle_inhibit = "focus"; }
+        # { match.class = "^(REAPER)$"; stay_focused = true; }
       ];
-
-      exec-once = [
-        # clipboard manager
-        "wl-paste --watch cliphist store"
-      ];
-      # source = "~/.config/hypr/hyprland-test.conf";
     };
+
+    wayland.windowManager.hyprland.extraConfig = ''
+      hl.on("hyprland.start", function()
+        hl.exec_cmd("wl-paste --watch cliphist store")
+      end)
+    '';
+
     # hyprland crash reports
     custom.persist = { home.directories = [ ".cache/hyprland" ]; };
   };

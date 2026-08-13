@@ -8,12 +8,12 @@
 lib.mkIf config.custom.hyprland.lock {
   home.packages = [ pkgs.hyprlock ];
 
-  wayland.windowManager.hyprland.settings = {
-    bind = [ "SUPER, x, exec, hyprlock" ];
-
-    # handle laptop lid
-    bindl = lib.mkIf isLaptop [ ",switch:Lid Switch, exec, hyprlock" ];
-  };
+  wayland.windowManager.hyprland.extraConfig = ''
+    hl.bind("SUPER + x", hl.dsp.exec_cmd("hyprlock"))
+    ${lib.optionalString isLaptop ''
+    hl.bind("switch:Lid Switch", hl.dsp.exec_cmd("hyprlock"), { locked = true })
+    ''}
+  '';
 
   custom.wallust = {
     templates = {

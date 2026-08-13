@@ -37,11 +37,6 @@
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  programs.fish.interactiveShellInit = ''
-    if test -z "$ZELLIJ"
-      exec zellij attach --create main
-    end
-  '';
 
   programs.tmux = {
     enable = true;

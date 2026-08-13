@@ -71,6 +71,16 @@ in {
               '';
               default = "0, 0, 0, 0";
             };
+            reserved = lib.mkOption {
+              type = with lib.types; nullOr (either int (attrsOf int));
+              description = ''
+                Reserved area for hl.monitor() (CssGap format).
+                Either an integer (all sides) or an attrset with optional
+                top, right, bottom, left fields.
+                Example: { left = 600; }
+              '';
+              default = null;
+            };
             scale = lib.mkOption {
               type = float;
               description = ''
