@@ -63,6 +63,11 @@
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
 
     dzgui.url = "github:jiriks74/dzgui.flake";
+
+    desktop-goose = {
+      url = "github:jeffthepineapple/desktop-goose-linux-port";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # flake-utils is unnecessary

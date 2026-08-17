@@ -186,15 +186,9 @@ lib.mkIf cfg.enable {
           };
         };
 
-        # "hyprland/workspaces" = {
-          # TODO: pacman, remove active inverse circle
-          # format = "{icon}";
-          # format-icons = {
-          #   active = "󰮯";
-          #   default = "·";
-          #   urgent = "󰊠";
-          # };
-        # };
+        "hyprland/workspaces" = {
+          on-click = "hyprctl eval 'hl.dispatch(hl.dsp.focus({workspace={id}}))'";
+        };
 
         "hyprland/window" = {
           rewrite = {

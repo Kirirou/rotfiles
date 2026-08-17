@@ -26,6 +26,7 @@ in
 {
   home = {
     pointerCursor = {
+      enable = true;
       package = pkgs.simp1e-cursors;
       name = "Simp1e-Gruvbox-Dark";
       size = 28;
@@ -77,7 +78,38 @@ in
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;
     };
-    gtk4.theme = config.gtk.theme;
+    gtk4.extraCss = ''
+      window, .background {
+        background-color: #282828;
+        color: #ebdbb2;
+      }
+      headerbar {
+        background-color: #3c3836;
+        color: #ebdbb2;
+        border-bottom: 1px solid #1d2021;
+      }
+      .sidebar, list, listview {
+        background-color: #282828;
+        color: #ebdbb2;
+      }
+      button {
+        background-color: #504945;
+        color: #ebdbb2;
+      }
+      button:hover {
+        background-color: #665c54;
+      }
+      entry, spinbutton {
+        background-color: #3c3836;
+        color: #ebdbb2;
+      }
+      scale trough {
+        background-color: #504945;
+      }
+      scale highlight {
+        background-color: #b8bb26;
+      }
+    '';
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;

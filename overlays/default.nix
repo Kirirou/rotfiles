@@ -38,11 +38,9 @@ in {
 
       opensubdiv = prev.opensubdiv.override {
         cudaSupport = true;
-        # cudaPackages = prev.cudaPackages_12_6;
       };
       blender = prev.blender.override {
         cudaSupport = true;
-        # cudaPackages = prev.cudaPackages_12_6;
       };
 
       # cmake = prev.cmake.overrideAttrs (oldAttrs: {

@@ -5,13 +5,10 @@
   ...
 }:
 let
-  tex = (pkgs.texlive.combine {
-    inherit (pkgs.texlive) scheme-full
-      dvisvgm dvipng # for preview and export as html
-      wrapfig amsmath ulem hyperref capt-of tex-gyre cyrillic;
-      # (setq org-latex-compiler "lualatex")
-      # (setq org-preview-latex-default-process 'dvisvgm)
-  });
+  tex = pkgs.texliveSmall.withPackages (ps: with ps; [
+    dvisvgm dvipng
+    wrapfig amsmath ulem hyperref capt-of tex-gyre cyrillic
+  ]);
 in
 {
   config = lib.mkIf config.custom.helix.enable {

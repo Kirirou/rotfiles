@@ -113,6 +113,26 @@
         "type": "github"
       }
     },
+    "desktop-goose": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786575027,
+        "narHash": "sha256-wNP5WwjpP6+qJ+F0AQPWpmBaXUmk/LOLoS9lhRT8bJY=",
+        "owner": "jeffthepineapple",
+        "repo": "desktop-goose-linux-port",
+        "rev": "8e0613154797423d9172a8718c79305391d425c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jeffthepineapple",
+        "repo": "desktop-goose-linux-port",
+        "type": "github"
+      }
+    },
     "devenv": {
       "inputs": {
         "cachix": "cachix",
@@ -1214,6 +1234,7 @@
     },
     "root": {
       "inputs": {
+        "desktop-goose": "desktop-goose",
         "devenv": "devenv",
         "dzgui": "dzgui",
         "fenix": "fenix",

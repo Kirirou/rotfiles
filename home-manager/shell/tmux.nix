@@ -37,6 +37,15 @@
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
+  programs.fish.interactiveShellInit = ''
+    if test -z "$ZELLIJ"
+      set _zj_adjs brave calm cool dark fast fierce free grand jolly kind lone neat quick sharp silent sleek slim smug soft stern swift tidy wild wise
+      set _zj_nouns bear cat crane deer dove duck eagle elk falcon fox hawk heron jay kite lark lynx owl panda raven robin seal swan wolf wren
+      set _zj_adj $_zj_adjs[(random 1 (count $_zj_adjs))]
+      set _zj_noun $_zj_nouns[(random 1 (count $_zj_nouns))]
+      zellij --session "$_zj_adj-$_zj_noun"
+    end
+  '';
 
   programs.tmux = {
     enable = true;

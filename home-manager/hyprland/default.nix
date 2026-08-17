@@ -56,6 +56,7 @@ in {
       env = [
         { _args = ["HYPRCURSOR_THEME" config.home.pointerCursor.name]; }
         { _args = ["HYPRCURSOR_SIZE" (toString config.home.pointerCursor.size)]; }
+        { _args = ["GTK_THEME" config.gtk.theme.name]; }
       ];
 
       config = {
@@ -149,7 +150,7 @@ in {
           enable_swallow = false;
           swallow_regex = "^([Kk]itty|[Ww]ezterm)$";
           focus_on_activate = false;
-          background_color = "0x383539";
+          background_color = "0x1C1A1C";
         };
 
         debug.disable_logs = false;
@@ -180,9 +181,10 @@ in {
         { match.class = "ayaka-gui"; float = true; }
         { match.class = "org.fcitx."; float = true; }
         { match.class = "fl64.exe"; float = true; }
-        { match.class = "blender"; float = true; }
+        { match.class = "blender"; float = true; min_size = "1280 720"; }
         { match.class = "anki"; float = true; }
         { match.class = "SnekStudio"; decorate = false; }
+        { match.class = "steam_app_3655784451"; float = true; }
         # do not idle while watching videos
         { match.class = "librewolf"; idle_inhibit = "focus"; }
         { match.class = "YouTube"; idle_inhibit = "focus"; }

@@ -119,6 +119,7 @@
       teamspeak6-client
       guvcview
       inputs.dzgui.packages.${pkgs.stdenv.hostPlatform.system}.dzgui
+      inputs.desktop-goose.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
   };
 }
