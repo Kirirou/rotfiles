@@ -6,6 +6,16 @@
   ...
 }: {
   config = {
+    # Pipewire/wireplumber below are pinned to CPU 5 via AllowedCPUs, but
+    # that's only a soft affinity hint - the general scheduler can still
+    # put other work on CPU 5, contending with the realtime audio thread.
+    # isolcpus pulls CPU 5 out of the default SMP scheduling domain (only
+    # processes explicitly affined to it, like pipewire below, will run
+    # there); nohz_full/rcu_nocbs stop timer ticks and RCU callbacks from
+    # interrupting it too. This makes the audio isolation an actual
+    # guarantee instead of a hint the scheduler can ignore.
+    boot.kernelParams = [ "isolcpus=5" "nohz_full=5" "rcu_nocbs=5" ];
+
     # setup pipewire for audio
     security.rtkit.enable = true;
     services.pipewire = {

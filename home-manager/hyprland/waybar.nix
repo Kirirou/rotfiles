@@ -24,12 +24,39 @@ lib.mkIf cfg.enable {
     shell.packages = {
       brightness-ddc = pkgs.writeShellApplication {
         name = "brightness-ddc";
-        runtimeInputs = with pkgs; [ ddcutil coreutils gnugrep ];
+        runtimeInputs = with pkgs; [ ddcutil coreutils gnugrep util-linux ];
         text = ''
           #!/usr/bin/env bash
 
+          # DDC/CI over I2C is slow (each getvcp/setvcp can take hundreds of ms
+          # to a couple seconds). Waybar fires on-scroll once per scroll tick
+          # with no throttling, so scrolling fast used to spawn a new ddcutil
+          # process per tick faster than they could complete, piling up dozens
+          # of concurrent processes fighting over the same I2C bus and hanging
+          # the CPU. Cache the target value locally (skip the slow read on
+          # every tick) and debounce the actual write behind a non-blocking
+          # lock: only one writer runs at a time, and it applies whatever the
+          # latest requested value is once a short burst of scrolling settles.
+          state_dir="''${XDG_RUNTIME_DIR:-/tmp}/brightness-ddc"
+          mkdir -p "$state_dir"
+          target_file="$state_dir/target"
+          lock_file="$state_dir/lock"
+
           get_current_brightness() {
             ddcutil getvcp 10 | grep -oP 'current value = +\K[0-9]+'
+          }
+
+          apply_debounced() {
+            echo "$1" >"$target_file"
+            (
+              flock -n 9 || exit 0
+              sleep 0.2
+              value="$(cat "$target_file")"
+              for i in $(seq 1 "$(ddcutil detect --brief | grep -c '^Display')"); do
+                ddcutil --sleep-multiplier=0 --display "$i" setvcp 10 "$value"
+              done
+            ) 9>"$lock_file" &
+            disown
           }
 
           case "$1" in
@@ -37,32 +64,29 @@ lib.mkIf cfg.enable {
               get_current_brightness
               ;;
             set)
-              value="$2"
-              for i in $(seq 1 "$(ddcutil detect --brief | grep -c '^Display')"); do
-                ddcutil --sleep-multiplier=0 --display "$i" setvcp 10 "$value"
-              done
+              apply_debounced "$2"
               ;;
             toggle)
               current=$(get_current_brightness)
               if [ "$current" -gt 50 ]; then
-                ddcutil setvcp 10 0
+                apply_debounced 0
               else
-                ddcutil setvcp 10 100
+                apply_debounced 100
               fi
               ;;
             up)
               delta="$2"
-              current=$(get_current_brightness)
+              current="$(cat "$target_file" 2>/dev/null || get_current_brightness)"
               new=$((current + delta))
               [ "$new" -gt 100 ] && new=100
-              ddcutil setvcp 10 "$new"
+              apply_debounced "$new"
               ;;
             down)
               delta="$2"
-              current=$(get_current_brightness)
+              current="$(cat "$target_file" 2>/dev/null || get_current_brightness)"
               new=$((current - delta))
               [ "$new" -lt 0 ] && new=0
-              ddcutil setvcp 10 "$new"
+              apply_debounced "$new"
               ;;
             *)
               echo "Usage: brightness-ddc {get|set <value>|toggle|up <value>|down <value>}"
@@ -78,6 +102,9 @@ lib.mkIf cfg.enable {
       let
         alertSpan = s: ''<span color="{{color4}}">${s}</span>'';
         displays = config.custom.displays;
+        focusWorkspace = pkgs.writeShellScriptBin "hypr-focus-workspace" ''
+          exec hyprctl eval "hl.dispatch(hl.dsp.focus({workspace=$1}))"
+        '';
       in
       {
         backlight = {
@@ -136,17 +163,17 @@ lib.mkIf cfg.enable {
         };
 
         memory = {
-          interval = 1;
+          interval = 3;
           format = "{used:0.1f}G|{total:0.1f}G ";
         };
         cpu = {
-          interval = 1;
+          interval = 3;
           format = "{usage}|{load} ";
         };
 
         temperature = {
           hwmon-path = cfg.hwmon;
-          interval = 1;
+          interval = 3;
           format = "{temperatureC}°C ";
         };
 
@@ -159,9 +186,9 @@ lib.mkIf cfg.enable {
 
         "custom/shade" = {
           format = "";
-          on-click = "hyprshade on blue-light-filter";
+          on-click = "hyprshade toggle blue-light-filter";
           # on-click-right = "hyprshade on vibrance";
-          on-click-right = "hyprshade on blue-light-filter2";
+          on-click-right = "hyprshade toggle blue-light-filter2";
           on-click-middle = "hyprshade off";
           tooltip = false;
         };
@@ -187,7 +214,7 @@ lib.mkIf cfg.enable {
         };
 
         "hyprland/workspaces" = {
-          on-click = "hyprctl eval 'hl.dispatch(hl.dsp.focus({workspace={id}}))'";
+          on-click = "${lib.getExe focusWorkspace} {id}";
         };
 
         "hyprland/window" = {

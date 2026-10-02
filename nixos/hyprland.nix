@@ -3,12 +3,24 @@
   inputs,
   lib,
   pkgs,
+  user,
   ...
 }:
 lib.mkIf config.custom.hyprland.enable {
   services.desktopManager.gnome.enable = lib.mkForce false;
   services.xserver.displayManager.lightdm.enable = lib.mkForce false;
   # services.displayManager.ly.enable = lib.mkForce true;
+
+  # Hyprland is started manually (the "hy" alias -> start-hyprland), often
+  # from an SSH session rather than the physical console. logind's default
+  # seat backend only grants GPU/input device access to sessions it
+  # classifies as an actual seat0 console login, so an SSH-launched Hyprland
+  # gets "libseat: Operation not permitted" on every input device and then
+  # "drm: Found no gpus to use" -> CBackend::create() failed, regardless of
+  # user permissions. seatd hands out device access itself, independent of
+  # session origin, which is what this workflow actually needs.
+  services.seatd.enable = true;
+  users.users.${user}.extraGroups = [ "seat" ];
 
   # See https://nixos.org/manual/nixos/stable/release-notes#sec-release-23.11
   # Fcitx5 Doesn't Start When Using WM

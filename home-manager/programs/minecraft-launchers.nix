@@ -10,6 +10,7 @@
       prismlauncher
       mcpelauncher-ui-qt
       cubiomes-viewer
+      modrinth-app
       jdk17
       jdt-language-server
     ];

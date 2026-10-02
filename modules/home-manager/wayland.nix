@@ -110,6 +110,11 @@ in {
               type = listOf str;
               description = "List of workspace string names";
             };
+            wlr_mode = lib.mkOption {
+              type = lib.types.nullOr str;
+              description = "Exact mode string for wlr-randr (e.g. 5120x1440@143.996994)";
+              default = null;
+            };
           };
         });
       default = [ ];
@@ -168,6 +173,10 @@ in {
         default = true;
       };
       hidden = lib.mkEnableOption "Hidden waybar by default";
+    };
+
+    wayvnc = {
+      enable = lib.mkEnableOption "wayvnc remote desktop server, capturing a headless output mirroring the primary display";
     };
   };
 }

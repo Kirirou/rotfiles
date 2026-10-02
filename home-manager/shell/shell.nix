@@ -17,8 +17,6 @@ in
         ":q" = "exit";
         ":q!" = "exit";
         c = "clear";
-        cat = "bat";
-        ccat = "command cat";
         crate = "cargo";
         isodate = ''date +"%Y-%m-%dT%H:%M:%S-%Z"'';
         lsblkf = ''lsblk -f --output TYPE,NAME,FSTYPE,ROTA,TRAN,SIZE,ID-LINK,MODEL,SERIAL,MOUNTPOINT,LABEL'';

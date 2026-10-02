@@ -1,4 +1,4 @@
-{ pkgs, lib, inputs, ... }: {
+{ pkgs, lib, inputs, config, ... }: {
   custom = {
     kbLayout = "jp";
     wifi.enable = true;
@@ -27,32 +27,42 @@
     # first monitor in list gets selected for waybar to show only at that monitor
     displays = [
       {
+        # left half: keys 1, 2, q, a, z, x all live here.
         display_name_output = "DP-3";
         mode = "5120x1440@144";
+        wlr_mode = "5120x1440@143.996994";
         position = "0x0";
         scale = 1.0;
         transform = 0;
-        workspace_names = [ "1" "2" "3" "q" "w" "e"];
-        workspaces = [ 1 2 3 5 6 7 ];
+        workspace_names = [ "1" "2" "q" "a" "z" "x" ];
+        workspaces = [ 1 2 5 8 11 12 ];
       }
       {
+        # retired from the keyboard-row workspace scheme (not part of the
+        # DP-3/HDMI-A-1 left-right split); still positioned/configured for
+        # whenever it's actually connected, just no workspaces pinned to it.
         display_name_output = "DP-2";
         mode = "2560x1080@200";
         position = "2560x1440";
         reserved = { left = 600; };
         scale = 1.0;
         transform = 0;
-        workspace_names = [ "a" "s" "d" "4" ];
-        workspaces = [ 8 9 10 4 ];
+        workspace_names = [ ];
+        workspaces = [ ];
       }
       {
+        # right half of the DP-3 ultrawide's split-PIP mode: same physical
+        # panel, second input. Positioned immediately to the right of DP-3
+        # at matching resolution/height so the cursor tracks correctly
+        # across the seam instead of jumping to a stacked-below offset.
+        # keys 3, 4, w, e, s, d, c all live here.
         display_name_output = "HDMI-A-1";
-        mode = "1920x1080@60";
-        position = "0x1440";
+        mode = "2560x1440@60";
+        position = "2560x0";
         scale = 1.0;
         transform = 0;
-        workspace_names = [ "x" "c" ];
-        workspaces = [ 12 13 ];
+        workspace_names = [ "3" "4" "w" "e" "s" "d" "c" ];
+        workspaces = [ 3 4 6 7 9 10 13 ];
       }
     ];
     terminal.size = 8;
@@ -68,8 +78,11 @@
       enable = true;
       persistent-workspaces = true;
       hidden = false;
-      hwmon = "/sys/class/hwmon/hwmon2/temp1_input";
+      # boot-stable symlink maintained by a udev rule in hosts/desktop/default.nix,
+      # since hwmonN numbering for coretemp isn't fixed across boots
+      hwmon = "/run/coretemp-temp1_input";
     };
+    wayvnc.enable = true;
 
     # Select touchscreen monitor by id
     # Find out monitor ID and names with "hyprctl monitors" command
@@ -110,16 +123,25 @@
 
     persist = {
       home.files = [ ".config/kritarc" ".config/kritadisplayrc" ];
-      home.directories = [ ".config/PureRef" ".config/dztui" ".local/share/Anki2" ".config/teams-for-linux" ".config/inkscape" ];
+      home.directories = [ ".config/PureRef" ".config/dztui" ".local/share/Anki2" ".config/teams-for-linux" ".config/inkscape" ".local/share/love" ];
     };
   };
+  home.file."Music".source = config.lib.file.mkOutOfStoreSymlink "/md/wdc-data/_SMALL/_MUSIC";
+
+  xdg.userDirs.music = "/md/wdc-data/_SMALL/_MUSIC";
+
   home = {
     packages = with pkgs; [
       krita inkscape anki
       teamspeak6-client
       guvcview
+      love
       inputs.dzgui.packages.${pkgs.stdenv.hostPlatform.system}.dzgui
       inputs.desktop-goose.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
+    file.".local/share/applications/protontricks.desktop".text = ''
+      [Desktop Entry]
+      NoDisplay=true
+    '';
   };
 }

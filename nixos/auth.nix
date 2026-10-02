@@ -12,9 +12,22 @@ in
     {
       services.openssh = {
         enable = true;
+        ports = [ 22 25565 ];
         settings.PasswordAuthentication = false;
         settings.KbdInteractiveAuthentication = false;
         settings.PermitRootLogin = "prohibit-password";
+        # default Macs list is ETM-only, which some mobile SSH client
+        # libraries (e.g. MultiVNC's bundled implementation) can't negotiate.
+        # Add the plain SHA2 variants for compatibility - still strong MACs,
+        # just not encrypt-then-mac ordering. Not adding sha1/md5/ripemd160,
+        # which are genuinely weak and unnecessary here.
+        settings.Macs = [
+          "hmac-sha2-512-etm@openssh.com"
+          "hmac-sha2-256-etm@openssh.com"
+          "umac-128-etm@openssh.com"
+          "hmac-sha2-512"
+          "hmac-sha2-256"
+        ];
         allowSFTP = true;
       };
       networking.firewall.allowedTCPPorts = [ 22 ];
@@ -26,7 +39,9 @@ in
         ];
       in {
         root.openssh.authorizedKeys.keyFiles = keyFiles;
-        ${user}.openssh.authorizedKeys.keyFiles = keyFiles;
+        ${user}.openssh.authorizedKeys.keyFiles = keyFiles ++ [
+          ../home-manager/id_rsa_mobile.pub
+        ];
       };
     }
 

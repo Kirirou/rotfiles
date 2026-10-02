@@ -9,6 +9,7 @@ in {
     ./startup.nix
     ./wallpaper.nix
     ./waybar.nix
+    ./wayvnc.nix
   ];
 
   config = lib.mkIf config.wayland.windowManager.hyprland.enable {
@@ -56,7 +57,6 @@ in {
       env = [
         { _args = ["HYPRCURSOR_THEME" config.home.pointerCursor.name]; }
         { _args = ["HYPRCURSOR_SIZE" (toString config.home.pointerCursor.size)]; }
-        { _args = ["GTK_THEME" config.gtk.theme.name]; }
       ];
 
       config = {
@@ -183,8 +183,12 @@ in {
         { match.class = "fl64.exe"; float = true; }
         { match.class = "blender"; float = true; min_size = "1280 720"; }
         { match.class = "anki"; float = true; }
+        # 9:16 portrait, height = 10% less than 1440 (1296), width = 1296 * 9/16
+        { match.class = "(?i)zathura"; float = true; center = true; size = "729 1296"; }
         { match.class = "SnekStudio"; decorate = false; }
         { match.class = "steam_app_3655784451"; float = true; }
+        # primary-password / http-auth prompt popup - float instead of tiling
+        { match.class = "librewolf"; match.title = "(?i)(password|authentication required)"; float = true; center = true; }
         # do not idle while watching videos
         { match.class = "librewolf"; idle_inhibit = "focus"; }
         { match.class = "YouTube"; idle_inhibit = "focus"; }

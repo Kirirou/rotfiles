@@ -10,6 +10,16 @@
 in {
   config = {
     home.packages = with pkgs; [ librewolf ];
+
+    # The VAAPI plumbing (nvidia-vaapi-driver, LIBVA_DRIVER_NAME, etc.) is
+    # set up system-wide in nixos/nvidia.nix, but LibreWolf doesn't
+    # self-enable hardware video decode on Linux - without this it silently
+    # falls back to software decode for every video.
+    home.file.".librewolf/rot/user.js".text = ''
+      user_pref("media.ffmpeg.vaapi.enabled", true);
+      user_pref("media.hardware-video-decoding.enabled", true);
+      user_pref("media.hardware-video-decoding.force-enabled", true);
+    '';
     programs = lib.mkIf config.custom.firefox.enable {
       # firefox
       firefox = {

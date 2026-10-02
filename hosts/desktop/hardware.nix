@@ -13,7 +13,7 @@
 
   boot.initrd.availableKernelModules = ["xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" "usbcore" "i2c-dev"];
   boot.initrd.kernelModules = ["i2c-dev" "evdi"];
-  boot.kernelModules = ["ip_tables" "iptable_nat" "iptable_filter" "nf_nat" "nf_conntrack" "kvm-intel" "usbcore" "snd-seq" "snd-rawmidi" "binder_linux" "ashmem_linux" "i915" "v4l2loopback" ];
+  boot.kernelModules = ["ip_tables" "iptable_nat" "iptable_filter" "nf_nat" "nf_conntrack" "kvm-intel" "usbcore" "snd-seq" "snd-rawmidi" "binder_linux" "ashmem_linux" "i915" "v4l2loopback" "iwlwifi"];
   boot.blacklistedKernelModules = ["amdgpu"];
   boot.extraModulePackages = [
     config.boot.kernelPackages.evdi
@@ -44,10 +44,8 @@
     "boot.shell_on_fail"
     "acpi_backlight=vendor"
     "video.use_native_backlight=1"
-    "isolcpus=4-5"
-    "nohz_full=4-5"
-    "rcu_nocbs=4-5"
     "threadirqs"
+    "video=DP-3:5120x1440@144"
   ];
   boot.tmp.useTmpfs = true;
 

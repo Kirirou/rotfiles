@@ -33,6 +33,7 @@ in {
         obs-gstreamer             # Use custom GStreamer pipelines as sources in OBS [https://github.com/fzwoch/obs-gstreamer]
         input-overlay             # Show keyboard, mouse, and gamepad inputs on stream [https://github.com/univrsal/input-overlay]
         obs-vkcapture             # Vulkan/OpenGL game capture plugin for Linux [https://github.com/nowrep/obs-vkcapture]
+        obs-pipewire-audio-capture # Capture per-application audio via PipeWire (Wayland-native audio sources) [https://github.com/dimtpap/obs-pipewire-audio-capture]
         obs-3d-effect             # 3D transform effect filter for sources (rotate in 3D space) [https://github.com/exeldro/obs-3d-effect]
         obs-websocket             # WebSocket API for OBS Studio (remote control interface) [https://github.com/obsproject/obs-websocket]
         obs-multi-rtmp            # Stream to multiple RTMP servers simultaneously (multi-stream) [https://github.com/sorayuki/obs-multi-rtmp]

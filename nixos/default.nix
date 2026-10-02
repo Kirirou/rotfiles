@@ -15,6 +15,7 @@
     ./keyd.nix
     ./sensors.nix
     ./vm.nix
+    ./oomd.nix
 
     ./auth.nix
     ./samba.nix

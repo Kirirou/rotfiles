@@ -40,15 +40,26 @@
       # custom.wl_shimeji
       (pkgs.writeShellApplication {
         name = "bbb";
-        runtimeInputs = [ pkgs.ddcutil ];
+        runtimeInputs = [ pkgs.ddcutil pkgs.gnugrep pkgs.gawk ];
         text = ''
           if [ -z "$1" ] || [ "$1" -lt 0 ] || [ "$1" -gt 100 ]; then
             echo "Usage: bbb <0-100>"
             exit 1
           fi
 
-          for i in $(seq 1 5); do
-            ddcutil --display "$i" setvcp 10 "$1"
+          # Detect which display numbers actually exist instead of assuming a
+          # fixed range: a hardcoded range aborts the whole script (set -e)
+          # the moment it hits a display index that isn't connected, since
+          # ddcutil fails hard on an unknown --display N.
+          displays=$(ddcutil detect --terse | grep -oP '(?<=^Display )\d+')
+
+          if [ -z "$displays" ]; then
+            echo "bbb: no DDC/CI displays detected"
+            exit 1
+          fi
+
+          for i in $displays; do
+            ddcutil --display "$i" setvcp 10 "$1" || echo "bbb: failed to set brightness on display $i"
           done
         '';
       })

@@ -23,6 +23,7 @@
         page-padding = 1;
         adjust-open = "best-fit";
         recolor = false; # invert by default
+        selection-clipboard = "clipboard";
       };
     };
   };

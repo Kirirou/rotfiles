@@ -55,7 +55,6 @@
         zathura
         mupdf
         # digikam
-        darktable
         trash-cli
         xdg-utils
         zenity

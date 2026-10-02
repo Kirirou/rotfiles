@@ -110,16 +110,18 @@ config = lib.mkIf config.custom.reaper.enable {
       };
     };
 
-    # OSC send for muting tracks in REAPER
-    # q w e r t y   → ARM ON   (tracks 1–6)
-    # a s d f g h   → ARM OFF  (tracks 1–6)
+    /* OSC send for muting tracks in REAPER, via a submap entered on
+       SUPER+SHIFT+r (was SUPER+SHIFT+z, which collided with the
+       left-monitor workspace keybind). Not currently in use.
+       q w e r t y   → ARM ON   (tracks 1–6)
+       a s d f g h   → ARM OFF  (tracks 1–6)
 
     wayland.windowManager.hyprland.extraConfig = ''
-      hl.bind("SUPER + SHIFT + z", hl.dsp.exec_cmd("play -n synth 0.1 sine 300 vol 0.3"))
-      hl.bind("SUPER + SHIFT + z", hl.dsp.submap("reaper"))
+      hl.bind("SUPER + SHIFT + r", hl.dsp.exec_cmd("play -n synth 0.1 sine 300 vol 0.3"))
+      hl.bind("SUPER + SHIFT + r", hl.dsp.submap("reaper"))
       hl.define_submap("reaper", function()
-        hl.bind("z", hl.dsp.exec_cmd("play -n synth 0.1 sine 200 vol 0.3"))
-        hl.bind("z", hl.dsp.submap("reset"))
+        hl.bind("Escape", hl.dsp.exec_cmd("play -n synth 0.1 sine 200 vol 0.3"))
+        hl.bind("Escape", hl.dsp.submap("reset"))
         hl.bind("q", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/1/recarm i 1"))
         hl.bind("w", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/2/recarm i 1"))
         hl.bind("e", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/3/recarm i 1"))
@@ -134,6 +136,7 @@ config = lib.mkIf config.custom.reaper.enable {
         hl.bind("h", hl.dsp.exec_cmd("${pkgs.liblo}/bin/oscsend localhost 9800 /track/6/recarm i 0"))
       end)
     '';
+    */
 
     home.shellAliases = {
       "5reaper" = "taskset -c 4-5 reaper";

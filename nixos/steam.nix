@@ -8,6 +8,9 @@
   config = lib.mkIf config.custom.steam.enable {
     programs.steam = {
       enable = true;
+      package = pkgs.steam.override {
+        extraProfile = "export SDL_VIDEODRIVER=x11";
+      };
       fontPackages = with pkgs; [
           monocraft
           noto-fonts
@@ -113,6 +116,8 @@
     #   options = ["defaults" "size=48G" "mode=777"];
     #   neededForBoot = false;
     # };
+
+    boot.kernel.sysctl."kernel.yama.ptrace_scope" = 0;
 
     networking.firewall = {
       allowedUDPPorts = [ 11573 ];

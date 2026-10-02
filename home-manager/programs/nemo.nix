@@ -7,6 +7,8 @@
 {
   home.packages = with pkgs; [
     krusader
+    doublecmd
+    file-roller
     nemo-fileroller
     webp-pixbuf-loader # for webp thumbnails
     nemo-with-extensions
@@ -82,6 +84,7 @@
     window_rule = [
       { match.class = "nemo"; float = true; force_rgbx = true; }
       { match.class = "org.kde.krusader"; float = true; force_rgbx = true; }
+      { match.class = "doublecmd"; float = true; force_rgbx = true; }
     ];
   };
 
@@ -91,6 +94,7 @@
       directories = [
         # folder preferences such as view mode and sort order
         ".local/share/gvfs-metadata"
+        ".config/doublecmd"
       ];
       cache = [
         # thumbnail cache

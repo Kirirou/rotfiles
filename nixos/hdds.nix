@@ -1,4 +1,4 @@
-{ lib, config, user, ... }:
+{ lib, config, pkgs, user, ... }:
 let
   cfg = config.custom.hdds;
   home-dir = config.hm.home.homeDirectory;
@@ -6,6 +6,7 @@ let
   wdc-data-dataset = "wdc-blue/data";
   wdc-okii-mountpoint = "/md/wdc-okii";
   wdc-okii-dataset = "wdc-blue/okii";
+  backup-gold-pool = "backup-gold";
 in {
   config = lib.mkIf cfg.enable {
     # non os zfs disks
@@ -13,9 +14,13 @@ in {
       (lib.optionalString cfg.wdc1tb "wdc-blue")
     ];
     boot.kernelModules = [ "brd" ];
+    # zfs_arc_max is set once, via kernel param, in nixos/zfs.nix - it used
+    # to also be (redundantly and inconsistently, 48GiB vs that file's
+    # 16GiB) set here via modprobe config. The kernel param wins in
+    # practice, so this was pure dead weight that just made it unclear
+    # which value actually applied.
     boot.extraModprobeConfig = ''
       options brd rd_nr=1 rd_size=41943040
-      options zfs zfs_arc_max=51539607552
     '';
 
     services = {
@@ -36,6 +41,43 @@ in {
             monthly = 1;
           };
         };
+      };
+    };
+
+    # opportunistic backup of wdc-blue onto the spare WD Gold: it's the
+    # drive that intermittently fails to enumerate at boot, so this never
+    # keeps the pool imported - it tries, syncs if the drive showed up,
+    # exports again, and just no-ops otherwise until the next scheduled try
+    systemd.services.backup-gold-sync = lib.mkIf cfg.wdc1tb {
+      description = "Opportunistically sync wdc-blue to backup-gold if present";
+      path = [ config.boot.zfs.package pkgs.sanoid ];
+      serviceConfig = {
+        Type = "oneshot";
+        Nice = 15;
+        IOSchedulingClass = "idle";
+      };
+      script = ''
+        set -uo pipefail
+
+        if ! zpool import ${backup-gold-pool} 2>&1; then
+          echo "backup-gold: drive not present or import failed, skipping (will retry next scheduled run)"
+          exit 0
+        fi
+
+        trap 'zpool export ${backup-gold-pool} 2>/dev/null || true' EXIT
+
+        echo "backup-gold: drive present, starting sync"
+        syncoid --recursive wdc-blue ${backup-gold-pool}
+      '';
+    };
+
+    systemd.timers.backup-gold-sync = lib.mkIf cfg.wdc1tb {
+      description = "Try a backup-gold sync once daily, sometime between 4am-9am while away from the PC";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*-*-* 04:00:00";
+        Persistent = true;
+        RandomizedDelaySec = "5h";
       };
     };
 

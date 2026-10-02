@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//md/wdc-data/_DOWNLOADS/**)",
+      "Bash(yt-dlp --skip-download --write-subs --sub-langs live_chat \"https://www.youtube.com/watch?v=Fqpn034_Qlo\")"
+    ]
+  }
+}

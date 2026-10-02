@@ -53,16 +53,44 @@ in
     # set dark theme for gtk 4
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
+      text-scaling-factor = 1.15;
     };
   };
-
-  home.sessionVariables.GTK_THEME = "gruvbox-dark";
 
   gtk = {
     enable = true;
     theme = {
       name = "gruvbox-dark";
-      package = pkgs.gruvbox-dark-gtk;
+      package = pkgs.gruvbox-dark-gtk.overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          mkdir -p $out/share/themes/gruvbox-dark/gtk-4.0
+          cat > $out/share/themes/gruvbox-dark/gtk-4.0/gtk.css << 'EOF'
+@define-color window_bg_color #282828;
+@define-color window_fg_color #ebdbb2;
+@define-color view_bg_color #1d2021;
+@define-color view_fg_color #ebdbb2;
+@define-color headerbar_bg_color #3c3836;
+@define-color headerbar_fg_color #ebdbb2;
+@define-color headerbar_border_color #1d2021;
+@define-color sidebar_bg_color #282828;
+@define-color sidebar_fg_color #ebdbb2;
+@define-color card_bg_color #3c3836;
+@define-color card_fg_color #ebdbb2;
+@define-color popover_bg_color #3c3836;
+@define-color popover_fg_color #ebdbb2;
+@define-color dialog_bg_color #282828;
+@define-color dialog_fg_color #ebdbb2;
+@define-color accent_bg_color #b8bb26;
+@define-color accent_fg_color #1d2021;
+@define-color accent_color #b8bb26;
+@define-color destructive_bg_color #cc241d;
+@define-color destructive_fg_color #ebdbb2;
+@define-color success_bg_color #98971a;
+@define-color warning_bg_color #d79921;
+@define-color error_bg_color #cc241d;
+EOF
+        '';
+      });
     };
     iconTheme = {
       name = "oomox-gruvbox-dark";
@@ -78,37 +106,25 @@ in
       gtk-application-prefer-dark-theme = 1;
       gtk-error-bell = 0;
     };
+    gtk4.theme = config.gtk.theme;
     gtk4.extraCss = ''
-      window, .background {
-        background-color: #282828;
-        color: #ebdbb2;
-      }
-      headerbar {
-        background-color: #3c3836;
-        color: #ebdbb2;
-        border-bottom: 1px solid #1d2021;
-      }
-      .sidebar, list, listview {
-        background-color: #282828;
-        color: #ebdbb2;
-      }
-      button {
-        background-color: #504945;
-        color: #ebdbb2;
-      }
-      button:hover {
-        background-color: #665c54;
-      }
-      entry, spinbutton {
-        background-color: #3c3836;
-        color: #ebdbb2;
-      }
-      scale trough {
-        background-color: #504945;
-      }
-      scale highlight {
-        background-color: #b8bb26;
-      }
+      @define-color theme_bg_color #282828;
+      @define-color theme_fg_color #ebdbb2;
+      @define-color theme_base_color #1d2021;
+      @define-color theme_text_color #ebdbb2;
+      @define-color theme_selected_bg_color #b8bb26;
+      @define-color theme_selected_fg_color #1d2021;
+      @define-color insensitive_bg_color #3c3836;
+      @define-color insensitive_fg_color #928374;
+      @define-color insensitive_base_color #282828;
+      @define-color theme_unfocused_fg_color #a89984;
+      @define-color theme_unfocused_text_color #ebdbb2;
+      @define-color theme_unfocused_bg_color #282828;
+      @define-color theme_unfocused_base_color #1d2021;
+      @define-color theme_unfocused_selected_bg_color #98971a;
+      @define-color theme_unfocused_selected_fg_color #ebdbb2;
+      @define-color borders #504945;
+      @define-color unfocused_borders #3c3836;
     '';
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;

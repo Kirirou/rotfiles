@@ -11,8 +11,14 @@
     services.xserver.videoDrivers = [ "nvidia" "modesetting" ];
 
     boot = {
-      # nvidia-uvm is required for CUDA applications
-      kernelModules = [ "nvidia-uvm" ];
+      # nvidia-uvm is required for CUDA applications.
+      # nvidia/nvidia_modeset/nvidia_drm are normally auto-added by the nixpkgs
+      # nvidia module, but only when services.xserver.enable is true. This is a
+      # Wayland-only (Hyprland) setup with xserver disabled, so they'd otherwise
+      # only load via PCI-based udev autoprobe, which is racy against session
+      # start and silently leaves Hyprland on a fake fallback monitor if it loses
+      # the race. List them explicitly so they're always loaded at boot.
+      kernelModules = [ "nvidia-uvm" "nvidia" "nvidia_modeset" "nvidia_drm" ];
       # use nvidia framebuffer
       # https://wiki.gentoo.org/wiki/NVIDIA/nvidia-drivers#Kernel_module_parameters for more info.
       kernelParams = [ 
@@ -29,9 +35,23 @@
       nvidia = {
         modesetting.enable = true;
         powerManagement.enable = true;
-        open = true;
+        # Both beta (595.45.04) and production (595.84) open kernel modules
+        # crash identically under heavy Blender/CUDA GPU memory churn: repeated
+        # "Failed to insert new mapping node" / gpu_vaspace.c assertion failures
+        # followed by a GPF in nvidia_uvm's lazy-free worker. Signature points to
+        # a bug in the open modules' VA-space bookkeeping during memory
+        # oversubscription, not a specific version. Falling back to the closed
+        # kernel modules, and to the newest available branch while we're at it.
+        open = false;
         nvidiaSettings = false;
-        package = config.boot.kernelPackages.nvidiaPackages.beta;
+        package = config.boot.kernelPackages.nvidiaPackages.latest;
+        # Without persistence mode, the driver lets the GPU drop its
+        # initialized clock/power state between GPU contexts, forcing a
+        # re-ramp stall on the next client. On a desktop that constantly
+        # opens/closes GPU clients (browser, OBS, Proton games, REAPER
+        # plugin UIs, CUDA jobs), this is a classic source of periodic
+        # stutter that gets worse the longer a session runs.
+        nvidiaPersistenced = true;
       };
       graphics.extraPackages = with pkgs; [
         intel-vaapi-driver

@@ -64,6 +64,7 @@ in
       hl.bind("SUPER + s", hl.dsp.focus({ workspace = 9 }))
       hl.bind("SUPER + 0", hl.dsp.focus({ workspace = 10 }))
       hl.bind("SUPER + d", hl.dsp.focus({ workspace = 10 }))
+      hl.bind("SUPER + z", hl.dsp.focus({ workspace = 11 }))
       hl.bind("SUPER + x", hl.dsp.focus({ workspace = 12 }))
       hl.bind("SUPER + c", hl.dsp.focus({ workspace = 13 }))
       -- move window to workspace
@@ -83,6 +84,7 @@ in
       hl.bind("SUPER + SHIFT + s", hl.dsp.window.move({ workspace = 9, follow = false }))
       hl.bind("SUPER + SHIFT + 0", hl.dsp.window.move({ workspace = 10, follow = false }))
       hl.bind("SUPER + SHIFT + d", hl.dsp.window.move({ workspace = 10, follow = false }))
+      hl.bind("SUPER + SHIFT + z", hl.dsp.window.move({ workspace = 11, follow = false }))
       hl.bind("SUPER + SHIFT + x", hl.dsp.window.move({ workspace = 12, follow = false }))
       hl.bind("SUPER + SHIFT + c", hl.dsp.window.move({ workspace = 13, follow = false }))
       -- monitor cycling
