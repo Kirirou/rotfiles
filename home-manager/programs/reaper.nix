@@ -16,6 +16,25 @@ config = lib.mkIf config.custom.reaper.enable {
       pkgs.reaper-reapack-extension
       pkgs.labwc
 
+      # realtime-audio.slice gets max io.weight (see nixos/audio.nix) - a
+      # stalled sample load in REAPER itself is just as audible as pipewire
+      # stalling, so REAPER needs to be in the same priority slice, not
+      # just pipewire/wireplumber. Wrapped (rather than a plain alias) so
+      # it's also reachable as a real binary from the app menu entry below.
+      (pkgs.writeShellApplication {
+        name = "5reaper";
+        text = ''
+          systemd-run --user --scope --slice=realtime-audio.slice -- taskset -c 4-5 reaper
+        '';
+      })
+      (pkgs.makeDesktopItem {
+        name = "5reaper";
+        exec = "5reaper";
+        desktopName = "REAPER (RT)";
+        genericName = "Digital Audio Workstation";
+        icon = "cockos-reaper";
+      })
+
       # PLUGINS:
       # --------
       pkgs.helm
@@ -137,10 +156,6 @@ config = lib.mkIf config.custom.reaper.enable {
       end)
     '';
     */
-
-    home.shellAliases = {
-      "5reaper" = "taskset -c 4-5 reaper";
-    };
 
     custom.persist = {
       home.directories = [

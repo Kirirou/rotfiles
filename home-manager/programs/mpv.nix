@@ -26,6 +26,12 @@
   programs.mpv = lib.mkMerge [
     {
       enable = true;
+      # cdda:// (audio CD playback) - mpv has its own libcdio/libcdio-paranoia
+      # based CD reader, independent of ffmpeg, but nixpkgs' mpv-unwrapped
+      # ships it disabled by default.
+      package = pkgs.mpv.override {
+        mpv-unwrapped = pkgs.mpv-unwrapped.override { cddaSupport = true; };
+      };
       bindings = {
         MBTN_LEFT = "cycle pause";
         WHEEL_UP = "ignore";

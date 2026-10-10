@@ -15,9 +15,9 @@
 
     dns.enable = true;
     bluetooth.enable = true;
-    vm.enable = true;
+    vm.enable = false; # virt disabled in BIOS - flip back to true once re-enabled
     hotspot = {
-      enable = true;
+      enable = false;
       internet_iface = "eno1";
       wifi_iface = "wlp2s0";
     };
@@ -33,8 +33,10 @@
     jellyfin.enable = false;
     pr_managment.enable = true;
     nginx.enable = true;
-    llm.enable = true;
-    docker.enable = true;
+    llm.enable = false;
+    # Disabled: zero containers actually declared/running anywhere, just an
+    # always-on daemon (enableOnBoot) with nothing depending on it.
+    docker.enable = false;
     surrealdb.enable = true;
     bittorrent = {
       enable = true;
@@ -88,6 +90,7 @@
 
   # networking.firewall.enable = false;
 
-  # fix clock to be compatible with windows
-  time.hardwareClockInLocalTime = true;
+  # false leaves /etc/adjtime unmanaged by NixOS, so the kernel's own
+  # RTC auto-sync (via NTP) can keep the hardware clock correct.
+  time.hardwareClockInLocalTime = false;
 }

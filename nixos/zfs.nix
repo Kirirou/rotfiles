@@ -15,7 +15,17 @@ in
     supportedFilesystems = [ "zfs" ];
     # kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
     # kernelPackages = pkgs.linuxPackages_xanmod_latest; # commented out because of musnix owning it now in audio.nix
-    kernelParams = [ "zfs.zfs_arc_max=17179869184" ];
+    kernelParams = [
+      "zfs.zfs_arc_max=17179869184"
+      # Resilver/scrub throttling - stock defaults let a resilver issue as
+      # much I/O as the vdev will take, which starves everything else
+      # (confirmed tonight: a resilver alone drove IO pressure to 45%+ full
+      # stall). These trade resilver/scrub speed for leaving headroom for
+      # latency-sensitive work (audio) while one is running.
+      "zfs.zfs_scan_vdev_limit=4194304" # 4MB/vdev per scan interval, down from 16MB default
+      "zfs.zfs_vdev_scrub_max_active=1" # down from 3 - less queue depth competing with other IO
+      "zfs.zfs_resilver_min_time_ms=500" # down from 1500 - less guaranteed time slice per txg
+    ];
 
     zfs = {
       devNodes = lib.mkDefault "/dev/disk/by-id";
@@ -29,6 +39,26 @@ in
   services.zfs = {
     autoScrub.enable = true;
     trim.enable = true;
+  };
+
+  # A resilver/reattach cycle can leave a vdev's trim state stale - confirmed
+  # firsthand: after this pool's resilver, KISSIN's random-read IOPS had
+  # collapsed to ~1300 (vs. a healthy 30-40k+), and a manual `zpool trim`
+  # fully recovered it. Don't wait for the weekly autotrim to catch that -
+  # trim right when a resilver finishes.
+  environment.etc."zfs/zed.d/resilver_finish-trim.sh" = {
+    mode = "0555";
+    text = ''
+      #!${pkgs.runtimeShell}
+      [ -f "''${ZED_ZEDLET_DIR}/zed.rc" ] && . "''${ZED_ZEDLET_DIR}/zed.rc"
+      . "''${ZED_ZEDLET_DIR}/zed-functions.sh"
+
+      [ -n "''${ZEVENT_POOL}" ] || exit 1
+      zed_check_cmd "''${ZPOOL}" || exit 1
+
+      zed_log_msg "Trimming ''${ZEVENT_POOL} after resilver finish"
+      "''${ZPOOL}" trim "''${ZEVENT_POOL}"
+    '';
   };
 
   # 16GB swap
@@ -74,8 +104,49 @@ in
 
   systemd.services.systemd-udev-settle.enable = false;
 
+  # Defense-in-depth for bulk operations (rsync, cp, etc) on top of the
+  # realtime-audio.slice weighting in nixos/audio.nix: weight-based
+  # fairness only kicks in once there's contention, and already-dispatched
+  # low-priority requests can't be preempted mid-flight. A hard bandwidth
+  # cap means a bulk job never even tries to saturate the drive in the
+  # first place, so there's less queued-up work for anything latency
+  # sensitive to wait behind. Low IOWeight here is just belt-and-suspenders
+  # on top of that.
+  systemd.slices.background-bulk = {
+    description = "Bulk/background IO - lowest priority, bandwidth-capped";
+    sliceConfig = {
+      IOWeight = 10;
+    };
+  };
+
   environment.systemPackages = [
     pkgs.sanoid
+    (pkgs.writeShellScriptBin "niceio" ''
+      set -u
+      if [ $# -eq 0 ]; then
+        echo "usage: niceio <command> [args...]" >&2
+        echo "runs a command bandwidth-capped (20MB/s) on whatever drives currently back zroot" >&2
+        exit 1
+      fi
+
+      devices=""
+      for name in $(zpool status zroot 2>/dev/null | awk '/ONLINE|DEGRADED|OFFLINE/ && !/zroot|mirror|pool:|state:/ {print $1}'); do
+        real=$(readlink -f "/dev/disk/by-id/$name" 2>/dev/null) || continue
+        devices="$devices $real"
+      done
+
+      if [ -z "$devices" ]; then
+        echo "niceio: could not resolve zroot member devices, running unthrottled" >&2
+        exec "$@"
+      fi
+
+      args="--user --scope --slice=background-bulk.slice"
+      for d in $devices; do
+        args="$args -p IOReadBandwidthMax=$d\ 20M -p IOWriteBandwidthMax=$d\ 20M"
+      done
+
+      exec ${pkgs.systemd}/bin/systemd-run $args -- "$@"
+    '')
     (pkgs.writeShellScriptBin "zfs-rollback" ''
       DATASET=$(zfs list -H -o name | ${pkgs.fzf}/bin/fzf --header="Select dataset")
       [ -z "$DATASET" ] && exit 1
@@ -122,6 +193,16 @@ in
 
     datasets = {
       "zroot/persist" = {
+        use_template = [ "backup" ];
+        hourly = 24;
+        daily = 7;
+        weekly = 7;
+        monthly = 3;
+      };
+      # Local-only protection (accidental delete, bad update, etc). Not
+      # replicated off-pool anywhere - it's all regenerable Steam data, see
+      # nixos/steam.nix for why.
+      "zroot/steam" = {
         use_template = [ "backup" ];
         hourly = 24;
         daily = 7;

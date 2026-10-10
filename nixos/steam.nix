@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  user,
   ...
 }:
 {
@@ -125,9 +126,20 @@
     };
 
 
+    # Its own dataset (zroot/steam) rather than living inside zroot/persist:
+    # ~495GB of this is game installs/Proton/runtime containers/caches, all
+    # fully regenerable from Steam's own servers - no reason for it to be
+    # part of what gets backed up off-pool. It still gets local snapshots
+    # (see services.sanoid in nixos/zfs.nix) for protection against an
+    # accidental delete, just not replicated anywhere else.
+    fileSystems."/home/${user}/.local/share/Steam" = {
+      device = "zroot/steam";
+      fsType = "zfs";
+      neededForBoot = false;
+    };
+
     custom.persist = {
       home.directories = [
-        ".local/share/Steam"
         ".config/mangohud"
         ".steam"
         ".paradoxlauncher"

@@ -26,9 +26,110 @@
       jack.enable = true;
     };
     services.pulseaudio.enable = false;
-    systemd.user.services.pipewire.serviceConfig.AllowedCPUs = "5";
-    systemd.user.services.wireplumber.serviceConfig.AllowedCPUs = "5";
-    systemd.user.services.pipewire-pulse.serviceConfig.AllowedCPUs = "5";
+
+    # Highest io.weight slice for the whole realtime audio path - not just
+    # the pipewire daemon, but anything doing audio-critical work (REAPER
+    # itself included - a stalled sample load in REAPER is just as audible
+    # as pipewire stalling). io.weight only does anything once BFQ is the
+    # active scheduler on the relevant drives (see boot.kernelPatches in
+    # hosts/desktop/hardware.nix and the scheduler-selection service
+    # below) - without BFQ, this is inert and the kernel just ignores it.
+    systemd.slices.realtime-audio = {
+      description = "Realtime audio path - highest IO priority";
+      sliceConfig = {
+        IOWeight = 10000; # max
+      };
+    };
+
+    systemd.user.services.pipewire.serviceConfig = {
+      AllowedCPUs = "5";
+      Slice = "realtime-audio.slice";
+      # Best-effort IOSchedulingClass at the highest priority (0) - realtime
+      # class needs CAP_SYS_ADMIN, which a user service doesn't have by
+      # default. This still jumps the block I/O queue ahead of normal
+      # processes (eg. a bulk rsync/zfs send) if pipewire ever does touch
+      # disk, without granting extra privileges to get there.
+      IOSchedulingClass = "best-effort";
+      IOSchedulingPriority = 0;
+    };
+    systemd.user.services.wireplumber.serviceConfig = {
+      AllowedCPUs = "5";
+      Slice = "realtime-audio.slice";
+      IOSchedulingClass = "best-effort";
+      IOSchedulingPriority = 0;
+    };
+    systemd.user.services.pipewire-pulse.serviceConfig = {
+      AllowedCPUs = "5";
+      Slice = "realtime-audio.slice";
+      IOSchedulingClass = "best-effort";
+      IOSchedulingPriority = 0;
+    };
+
+    # BFQ is cgroup-weight-aware (none/mq-deadline/kyber aren't) - without
+    # this, systemd.slices.realtime-audio's IOWeight above does nothing.
+    # Applies to every real block device (not just zroot) since REAPER
+    # streams sample libraries off wdc-blue too.
+    systemd.services.bfq-scheduler-all-disks = {
+      description = "Use the BFQ IO scheduler everywhere, for cgroup io.weight support";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "sysinit.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.writeShellScript "bfq-scheduler-all-disks" ''
+          for q in /sys/block/sd*/queue /sys/block/nvme*n*/queue; do
+            [ -f "$q/scheduler" ] && echo bfq > "$q/scheduler" 2>/dev/null || true
+          done
+        ''}";
+      };
+    };
+
+    # CPU isolation (isolcpus) only stops other *processes* landing on core
+    # 5 - hardware interrupts are routed independently and still default to
+    # every core (mask 3f = cores 0-5). Without this, disk/USB controller
+    # IRQs (nvme, ahci, xhci) can still land on and interrupt the isolated
+    # audio core. Pin them to cores 0-4 (mask 1f) instead, at boot.
+    systemd.services.irq-affinity-exclude-audio-core = {
+      description = "Keep disk/USB controller IRQs off the isolated audio core (5)";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "sysinit.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.writeShellScript "irq-affinity-exclude-audio-core" ''
+          while IFS= read -r line; do
+            irq="${"\${line%%:*}"}"
+            irq="${"\${irq// /}"}"
+            echo 1f > "/proc/irq/$irq/smp_affinity" 2>/dev/null || true
+          done < <(grep -E "nvme|ahci|xhci_hcd" /proc/interrupts)
+        ''}";
+      };
+    };
+
+    # isolcpus keeps the scheduler off core 5, but the idle driver still
+    # parks it in deep C-states between pipewire's ~10.6ms wakeups
+    # (quantum=512 @ 48kHz) - exit latency from those states is the kind
+    # of unpredictable spike that causes an xrun specifically under load,
+    # when something else on the system is also waking up cores around
+    # the same time. Disable every C-state past C1 on core 5 only, so it
+    # never sleeps deep enough to matter. Costs a few idle watts on that
+    # one core - cheap next to the RT kernel/isolcpus cost already paid.
+    systemd.services.disable-deep-cstates-audio-core = {
+      description = "Keep the isolated audio core (5) out of deep C-states";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "sysinit.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.writeShellScript "disable-deep-cstates-audio-core" ''
+          for state in /sys/devices/system/cpu/cpu5/cpuidle/state*/disable; do
+            [ "$(basename "$(dirname "$state")")" = "state0" ] && continue
+            [ "$(basename "$(dirname "$state")")" = "state1" ] && continue
+            echo 1 > "$state" 2>/dev/null || true
+          done
+        ''}";
+      };
+    };
     security.pam.loginLimits = [
       { domain = "${user}"; type = "-"; item = "rtprio"; value = "95"; }
       { domain = "${user}"; type = "-"; item = "memlock"; value = "unlimited"; }

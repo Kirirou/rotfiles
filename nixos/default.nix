@@ -57,7 +57,9 @@
     # services.devmon.enable = true;
     programs.dconf.enable = true;
 
-    services.teamviewer.enable = true;
+    # Disabled: zero traffic in/out across a full day+ of uptime, redundant
+    # with wayvnc for remote access.
+    services.teamviewer.enable = false;
 
     environment = {
       etc = {

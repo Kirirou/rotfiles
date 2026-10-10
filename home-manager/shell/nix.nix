@@ -79,6 +79,42 @@ in {
         cd - > /dev/null
       '';
     };
+    # build into boot via nix flake, without switching live
+    nsb = pkgs.writeShellApplication {
+      name = "nsb";
+      runtimeInputs = with pkgs; [
+        git
+        nh
+        ripgrep
+        custom.shell.nix-current-generation
+      ];
+      text = ''
+        sudo -l &>/dev/null
+        cd ${rots}
+
+        # stop bothering me about untracked files
+        untracked_files=$(git ls-files --exclude-standard --others .)
+        if [ -n "$untracked_files" ]; then
+          while IFS= read -r file; do
+          git add -- "$file"
+          done <<< "$untracked_files"
+        fi
+
+        # force boot to always use current host
+        if [[ "$*" == *"--hostname"* ]]; then
+            cleaned_args=("''${@/--hostname [^[:space:]]*/--hostname ${host}}")
+            nh os boot "''${cleaned_args[@]}" ${rots} -- --option eval-cache false
+        else
+            nh os boot "$@" --hostname ${host} ${rots} -- --option eval-cache false
+        fi
+
+        # only relevant if --dry is not passed
+        if [[ "$*" != *"--dry"* ]]; then
+          echo -e "Will boot into Generation \033[1m$(nix-current-generation)\033[0m next reboot"
+        fi
+        cd - > /dev/null
+      '';
+    };
     # test via nix flake
     nts = pkgs.writeShellApplication {
       name = "nts";

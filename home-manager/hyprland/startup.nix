@@ -18,7 +18,6 @@ in {
     hl.on("hyprland.start", function()
       hl.exec_cmd("hypr-ipc &")
       hl.exec_cmd("${openOnWorkspace 5 "librewolf"}")
-      hl.exec_cmd("${openOnWorkspace 1 "vesktop"}")
       hl.exec_cmd("${openOnWorkspace 13 "pavucontrol"}")
       hl.exec_cmd("${openOnWorkspace 10 "${lib.getExe pkgs.kitty} ~/_CURRENT"}")
       hl.exec_cmd("${openOnWorkspace 10 "nemo ~/_CURRENT"}")

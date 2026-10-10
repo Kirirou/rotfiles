@@ -38,6 +38,19 @@
         NF_CONNTRACK m
       '';
     }
+    {
+      # musnix's realtime kernel doesn't ship BFQ by default. BFQ_GROUP
+      # specifically is what makes cgroup io.weight actually mean something
+      # - without it, weighting pipewire/reaper above background bulk I/O
+      # (eg. rsync, zfs resilver) is impossible at the block-layer scheduler
+      # level.
+      name = "enable-bfq-group-sched";
+      patch = null;
+      extraConfig = ''
+        IOSCHED_BFQ y
+        BFQ_GROUP_IOSCHED y
+      '';
+    }
   ];
 
   boot.kernelParams = [
