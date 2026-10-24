@@ -55,6 +55,17 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # No default IPv6 route exists on this network (confirmed: `ip -6 route`
+  # is empty), but glibc's getaddrinfo still returns/prefers AAAA records
+  # for dual-stack hosts by default - anything that doesn't do a full
+  # Happy-Eyeballs-style fallback (eg. ollama's registry pulls) ends up
+  # trying the dead IPv6 path first and fails outright instead of just
+  # using the IPv4 address that actually works. Standard RFC 3484 fix:
+  # give IPv4-mapped addresses higher precedence than native IPv6.
+  networking.getaddrinfo.precedence = {
+    "::ffff:0:0/96" = 100;
+  };
+
   # Set Your time zone.
   time.timeZone = "Australia/Hobart";
 

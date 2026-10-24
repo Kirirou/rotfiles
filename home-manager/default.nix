@@ -8,6 +8,7 @@
 {
   imports = [
     ./hyprland
+    ./mango
     ./programs
     ./shell
   ];

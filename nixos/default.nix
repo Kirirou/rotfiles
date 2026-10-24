@@ -33,6 +33,7 @@
     ./filezilla.nix
     ./flatpak.nix
     ./hyprland.nix
+    ./mango.nix
     ./impermanence.nix
     ./nix.nix
     ./plasma.nix

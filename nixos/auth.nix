@@ -62,6 +62,21 @@ in
 
       security = {
         polkit.enable = true;
+        # Let the primary user restart/stop/start specifically the sillytavern
+        # and ollama services without a polkit auth prompt each time - these
+        # get toggled constantly while iterating on their config, and nothing
+        # else is granted here.
+        polkit.extraConfig = ''
+          polkit.addRule(function(action, subject) {
+              if (action.id == "org.freedesktop.systemd1.manage-units" &&
+                  subject.user == "${user}") {
+                  var unit = action.lookup("unit");
+                  if (unit == "sillytavern.service" || unit == "ollama.service") {
+                      return polkit.Result.YES;
+                  }
+              }
+          });
+        '';
         # i can't type
         sudo.extraConfig = "Defaults passwd_tries=10";
       };

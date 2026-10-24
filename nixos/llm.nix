@@ -71,6 +71,10 @@ lib.mkIf config.custom.llm.enable {
       OLLAMA_MAX_LOADED_MODELS = "2";
       OLLAMA_NUM_PARALLEL = "1";
       OLLAMA_DEBUG = "1";
+      # q8_0 KV cache roughly halves context memory cost vs fp16 with
+      # minimal quality loss, letting larger contexts fit the 3060 Ti's
+      # 8GB before spilling to CPU.
+      OLLAMA_KV_CACHE_TYPE = "q8_0";
       CUDA_PATH = "${pkgs.lib.makeLibraryPath [
         pkgs.cudaPackages.cudatoolkit
         pkgs.cudaPackages.cuda_cudart
@@ -86,6 +90,16 @@ lib.mkIf config.custom.llm.enable {
       ReadWritePaths = [ "/dev/dri" ];
       # Use ReadOnlyPaths if only read access is needed
       # ReadOnlyPaths = [ "/dev/dri" ];
+
+      # nixpkgs' default hardening for this service otherwise breaks
+      # outbound registry pulls outright (bare EOF on every attempt,
+      # confirmed via side-by-side test against the same binary
+      # unsandboxed). Bisected down to just these two directives -
+      # everything else (ProtectSystem, ProtectHome, DynamicUser,
+      # SystemCallFilter, PrivateUsers, MemoryDenyWriteExecute, etc.)
+      # stays at the nixpkgs default.
+      ProtectKernelTunables = lib.mkForce false;
+      RestrictNamespaces = lib.mkForce false;
     };
   };
 
@@ -93,6 +107,20 @@ lib.mkIf config.custom.llm.enable {
     enable = true;
     port = 7773;
     listen = true;
+    # Run as the real user instead of a dedicated system account - this is
+    # a single-user desktop (same pattern as REAPER, Steam, etc. in this
+    # config), so there's no isolation benefit to a separate sillytavern
+    # user, just permission friction every time the files need touching
+    # outside the app itself.
+    user = user;
+    group = "users";
+    # Default configFile points into the Nix store (read-only). The module's
+    # own tmpfiles rule symlinks /var/lib/SillyTavern/config.yaml -> this
+    # path with L+, and SillyTavern writes its resolved defaults back into
+    # that same file on first run - against the store, that's an EROFS and
+    # the service crash-loops. Point it at a real file inside the service's
+    # actual writable StateDirectory instead.
+    configFile = "/var/lib/SillyTavern/data/config.yaml";
   };
 
   # services.open-webui = {

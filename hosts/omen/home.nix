@@ -39,9 +39,6 @@
 
     kiwix.enable = true;
 
-
-    hyprland = {
-      modkey = "SUPER";
     # blender.enable = true;
     # reaper.enable = false;
 

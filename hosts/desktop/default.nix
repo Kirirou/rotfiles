@@ -17,7 +17,7 @@
     bluetooth.enable = true;
     vm.enable = false; # virt disabled in BIOS - flip back to true once re-enabled
     hotspot = {
-      enable = false;
+      enable = true;
       internet_iface = "eno1";
       wifi_iface = "wlp2s0";
     };
@@ -28,12 +28,13 @@
     samba.enable = false;
 
     monero.enable = true;
+    mango.enable = true;
     wine.enable = true;
     distrobox.enable = false;
     jellyfin.enable = false;
     pr_managment.enable = true;
     nginx.enable = true;
-    llm.enable = false;
+    llm.enable = true;
     # Disabled: zero containers actually declared/running anywhere, just an
     # always-on daemon (enableOnBoot) with nothing depending on it.
     docker.enable = false;

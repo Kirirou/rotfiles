@@ -28,6 +28,11 @@
 
     hyprland.url = "github:hyprwm/hyprland";
 
+    mango = {
+      url = "github:mangowm/mango";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     devenv.url = "github:cachix/devenv";
 
     impermanence.url = "github:nix-community/impermanence";

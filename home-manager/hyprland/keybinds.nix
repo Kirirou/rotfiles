@@ -30,7 +30,6 @@ in
       -- exit hyprland
       hl.bind("SUPER + CTRL + 5", hl.dsp.exit())
       hl.bind("SUPER + CTRL + Return", hl.dsp.exec_cmd("rofi -show power-menu -font \"${config.custom.fonts.monospace} 14\" -modi power-menu:rofi-power-menu"))
-      hl.bind("SUPER + CTRL + v", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))
       -- reset monitors
       hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("hypr-monitors"))
       -- lighting

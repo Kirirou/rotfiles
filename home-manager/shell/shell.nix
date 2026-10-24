@@ -38,6 +38,7 @@ in
         rst = "cd ~/pr/rustpr/ln/";
 
         hy = "exec start-hyprland &> /dev/null";
+        mg = "exec mango &> /dev/null";
 
         zz = "zellij";
         zj = "zellij";

@@ -9,12 +9,21 @@
     # Pipewire/wireplumber below are pinned to CPU 5 via AllowedCPUs, but
     # that's only a soft affinity hint - the general scheduler can still
     # put other work on CPU 5, contending with the realtime audio thread.
-    # isolcpus pulls CPU 5 out of the default SMP scheduling domain (only
-    # processes explicitly affined to it, like pipewire below, will run
-    # there); nohz_full/rcu_nocbs stop timer ticks and RCU callbacks from
-    # interrupting it too. This makes the audio isolation an actual
-    # guarantee instead of a hint the scheduler can ignore.
-    boot.kernelParams = [ "isolcpus=5" "nohz_full=5" "rcu_nocbs=5" ];
+    # isolcpus pulls CPUs 4-5 out of the default SMP scheduling domain (only
+    # processes explicitly affined to them, like pipewire and REAPER below,
+    # will run there); nohz_full/rcu_nocbs stop timer ticks and RCU
+    # callbacks from interrupting them too. This makes the audio isolation
+    # an actual guarantee instead of a hint the scheduler can ignore.
+    #
+    # Core 4 is included alongside 5 because REAPER (see
+    # home-manager/programs/reaper.nix's "5reaper") only gets a soft
+    # `taskset -c 4-5`, not a single-core pin - its own audio engine thread
+    # can land on either core. Isolating only 5 protected pipewire but left
+    # REAPER's thread exposed to contention whenever the scheduler happened
+    # to place it on 4, which is still open to everything else on the
+    # system (confirmed: xruns during a full streaming+tracking pipeline
+    # even with 5reaper in use).
+    boot.kernelParams = [ "isolcpus=4,5" "nohz_full=4,5" "rcu_nocbs=4,5" ];
 
     # setup pipewire for audio
     security.rtkit.enable = true;
@@ -84,13 +93,14 @@
       };
     };
 
-    # CPU isolation (isolcpus) only stops other *processes* landing on core
-    # 5 - hardware interrupts are routed independently and still default to
-    # every core (mask 3f = cores 0-5). Without this, disk/USB controller
-    # IRQs (nvme, ahci, xhci) can still land on and interrupt the isolated
-    # audio core. Pin them to cores 0-4 (mask 1f) instead, at boot.
+    # CPU isolation (isolcpus) only stops other *processes* landing on cores
+    # 4-5 - hardware interrupts are routed independently and still default
+    # to every core (mask 3f = cores 0-5). Without this, disk/USB
+    # controller IRQs (nvme, ahci, xhci) can still land on and interrupt
+    # the isolated audio cores - xhci in particular matters if the audio
+    # interface is USB. Pin them to cores 0-3 (mask 0f) instead, at boot.
     systemd.services.irq-affinity-exclude-audio-core = {
-      description = "Keep disk/USB controller IRQs off the isolated audio core (5)";
+      description = "Keep disk/USB controller IRQs off the isolated audio cores (4-5)";
       wantedBy = [ "multi-user.target" ];
       after = [ "sysinit.target" ];
       serviceConfig = {
@@ -100,29 +110,30 @@
           while IFS= read -r line; do
             irq="${"\${line%%:*}"}"
             irq="${"\${irq// /}"}"
-            echo 1f > "/proc/irq/$irq/smp_affinity" 2>/dev/null || true
+            echo 0f > "/proc/irq/$irq/smp_affinity" 2>/dev/null || true
           done < <(grep -E "nvme|ahci|xhci_hcd" /proc/interrupts)
         ''}";
       };
     };
 
-    # isolcpus keeps the scheduler off core 5, but the idle driver still
-    # parks it in deep C-states between pipewire's ~10.6ms wakeups
-    # (quantum=512 @ 48kHz) - exit latency from those states is the kind
-    # of unpredictable spike that causes an xrun specifically under load,
-    # when something else on the system is also waking up cores around
-    # the same time. Disable every C-state past C1 on core 5 only, so it
-    # never sleeps deep enough to matter. Costs a few idle watts on that
-    # one core - cheap next to the RT kernel/isolcpus cost already paid.
+    # isolcpus keeps the scheduler off cores 4-5, but the idle driver still
+    # parks them in deep C-states between wakeups (pipewire's ~10.6ms
+    # quantum=512 @ 48kHz, and REAPER's own audio callback on whichever of
+    # 4/5 it lands on) - exit latency from those states is the kind of
+    # unpredictable spike that causes an xrun specifically under load, when
+    # something else on the system is also waking up cores around the same
+    # time. Disable every C-state past C1 on both isolated cores, so
+    # neither sleeps deep enough to matter. Costs a few idle watts on two
+    # cores - cheap next to the RT kernel/isolcpus cost already paid.
     systemd.services.disable-deep-cstates-audio-core = {
-      description = "Keep the isolated audio core (5) out of deep C-states";
+      description = "Keep the isolated audio cores (4-5) out of deep C-states";
       wantedBy = [ "multi-user.target" ];
       after = [ "sysinit.target" ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
         ExecStart = "${pkgs.writeShellScript "disable-deep-cstates-audio-core" ''
-          for state in /sys/devices/system/cpu/cpu5/cpuidle/state*/disable; do
+          for state in /sys/devices/system/cpu/cpu{4,5}/cpuidle/state*/disable; do
             [ "$(basename "$(dirname "$state")")" = "state0" ] && continue
             [ "$(basename "$(dirname "$state")")" = "state1" ] && continue
             echo 1 > "$state" 2>/dev/null || true
