@@ -30,6 +30,7 @@
       moon-buggy
       tokei
       tenki
+      xev # keycode/keysym lookup - useful for debugging WM keybinds under non-ANSI layouts
       snowmachine
       ninvaders
       wl-color-picker
