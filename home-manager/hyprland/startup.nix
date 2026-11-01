@@ -23,7 +23,19 @@ in {
       hl.exec_cmd("${openOnWorkspace 10 "nemo ~/_CURRENT"}")
       hl.exec_cmd("${openOnWorkspace 10 "transmission-remote-gtk"}")
       hl.exec_cmd("${openOnWorkspace 10 "liferea"}")
-      hl.exec_cmd("${openOnWorkspace 8 "telegram-desktop"}")
+      -- "telegram-desktop" is NOT the real binary name - confirmed when
+      -- fixing the same bug in Mango's config (home-manager/mango/
+      -- default.nix): home-manager/programs/telegram.nix installs
+      -- pkgs.telegram-desktop, which ships a binary literally named
+      -- "Telegram" (capital T). The old lowercase name was failing
+      -- silently every boot.
+      hl.exec_cmd("${openOnWorkspace 8 "Telegram"}")
+      -- vesktop/discord was never autostarted here before - added per
+      -- explicit request. Uses the actual wrapper script
+      -- (home-manager/programs/discord.nix's "discord-vesktop", which sets
+      -- -u NIXOS_OZONE_WL and --use-gl=desktop to avoid an Electron/Wayland
+      -- rendering issue), not a raw "vesktop" binary call.
+      hl.exec_cmd("${openOnWorkspace 1 "discord-vesktop"}")
       hl.exec_cmd("${openOnWorkspace 3 "nix run nixpkgs#st fish"}")
       hl.exec_cmd("hyprctl eval 'hl.dispatch(hl.dsp.focus({workspace=1}))'")
       hl.exec_cmd("hyprctl eval 'hl.dispatch(hl.dsp.focus({workspace=4}))'")

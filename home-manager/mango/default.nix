@@ -2,6 +2,16 @@
 let
   pamixer = lib.getExe pkgs.pamixer;
   gammastep = lib.getExe pkgs.gammastep;
+  swayidle = lib.getExe pkgs.swayidle;
+
+  # DPMS timeout/resume via mango's own IPC CLI (mmsg, ships in the same package's bin/ as
+  # mango itself - confirmed, no separate packaging needed). sleep_monitor/wakeup_monitor
+  # each only affect the FIRST monitor matching their name argument and then stop (src/
+  # dispatch/bind.c: both wl_list_for_each loops `break` after the first match) - so unlike
+  # Hyprland's single dpms(on/off) call that covers every output at once, this needs one
+  # dispatch per real output name to cover all of them.
+  idleMonitors = [ "DP-3" "HDMI-A-1" "DP-2" ];
+  mmsgDispatchAll = func: lib.concatMapStringsSep "; " (m: "mmsg dispatch ${func},${m}") idleMonitors;
 
   # ironbar's native "clock" module has no click-to-change-format option (confirmed from its
   # docs - only format/format_popup/locale/show_week_numbers/orientation/justify), so
@@ -55,6 +65,12 @@ in
         # real-world config repo, not just the docs-site examples.
         focus_color = "0x33ccffee";
 
+        # Root/desktop background (behind windows) - confirmed real config key from
+        # DreamMaoMao/mango-config's config.conf (e.g. "root_color=0x201b14ff"). Matches
+        # Hyprland's misc.background_color concept, but set to solid black per request
+        # rather than Hyprland's actual value (0x1C1A1C).
+        root_color = "0x000000ff";
+
         # fcitx running is unrelated to this - fcitx is an input-method framework (handles
         # Japanese text conversion/candidates), it doesn't touch the raw key-to-character
         # map. That's XKB's job, and Mango had no XKB layout override at all (defaulted to
@@ -81,6 +97,12 @@ in
         # focus_cross_tag unset/0 since that's checked FIRST and would shift to an adjacent
         # tag instead of crossing monitors if enabled - not what was asked for.
         focus_cross_monitor = 1;
+
+        # Global complement to the per-app idle_inhibit_when_focus window_rules below -
+        # don't let the screen sleep while ANYTHING is fullscreen (confirmed real config key
+        # from src/config/option_defs.c), not just the specific librewolf/mpv/REAPER apps
+        # those rules cover.
+        idle_inhibit_when_fullscreen = 1;
 
         # Remove gaps between tiled windows AND between windows and the screen edge.
         gap_inner_horizontal = 0;
@@ -159,6 +181,20 @@ in
           "SUPER+CTRL,s,spawn,pkill gammastep"
           "SUPER+CTRL,d,spawn,sh -c 'pkill gammastep; exec ${gammastep} -O 3000'"
 
+          # --- screenshot/recording (ported 1:1 from home-manager/hyprland/screenshot.nix -
+          # "focal" is a standalone package (inputs.focal flake), not a Hyprland API wrapper,
+          # so the same commands apply here. UNVERIFIED: screenshot.nix's home.packages
+          # (focal/swappy/wf-recorder) is gated behind
+          # `config.wayland.windowManager.hyprland.enable`, not a generic option - these
+          # binds assume Hyprland stays enabled alongside Mango in this dual-WM setup (as it
+          # currently is), so the packages are actually installed. Also unverified: whether
+          # focal's "--rofi" window-picker mode uses hyprctl internally or is compositor-
+          # generic - test live.
+          "SUPER+SHIFT,backslash,spawn,focal image --area selection --no-notify --no-save --no-rounded-windows"
+          "SUPER,backslash,spawn,focal image --edit swappy --rofi --no-rounded-windows"
+          "SUPER+CTRL,backslash,spawn,focal image --area selection --ocr"
+          "ALT,backslash,spawn,focal video --rofi --no-rounded-windows"
+
           # --- focus (direction-based, confirmed dispatcher: focusdir) ---
           "SUPER,h,focusdir,left"
           "SUPER,l,focusdir,right"
@@ -178,14 +214,6 @@ in
           "SUPER+SHIFT,j,move_client,down"
 
           # --- tags (1:1 port of the old Hyprland 13-workspace scheme) ---
-          # tagsilent = send focused window to that tag WITHOUT switching your view there
-          # (Hyprland's SUPER+SHIFT+N "move, don't follow"). Plain "tag" (not used here)
-          # unconditionally calls client_switch_view - confirmed from mangowc's own
-          # src/manage/client.c, no flag suppresses that - so it's not usable for a
-          # move-without-follow bind at all; "tagsilent" is the dispatcher that actually
-          # skips the view switch (src/dispatch/bind.c: tag_silent() never calls
-          # client_switch_view, unlike tag_client()).
-          #
           # Focusing a tag uses "viewcrossmon,<tag>,<monitor>", NOT plain "view,<tag>" -
           # plain view always acts on server.selected_monitor (whichever monitor currently
           # has input focus), confirmed from src/dispatch/bind.c's view/focus_direction
@@ -198,6 +226,26 @@ in
           # are the exact DP-3/HDMI-A-1 split from the old Hyprland config.custom.displays
           # (hosts/desktop/home.nix): DP-3 gets 1,2,5(q),8(a),11(z),12(x); HDMI-A-1 gets
           # 3,4,6(w),7(e),9(s),10(d),13(c).
+          #
+          # Sending uses plain "tagsilent,<tag>" - back to this after trying
+          # "tagcrossmon,<tag>,<monitor>" (which correctly reassigns the client's monitor via
+          # client_set_monitor(), fixing an earlier cross-monitor visibility bug) and finding
+          # a WORSE bug in tagcrossmon itself: tag_cross_monitor()'s precondition is
+          # `match_monitor_spec(arg->v, server.selected_monitor)` - it checks whether the
+          # TARGET monitor matches wherever your mouse/input focus CURRENTLY is, not where
+          # the window being sent actually lives. If the cursor happens to be sitting
+          # anywhere over the target monitor at press time (even just drifted there, not
+          # actively in use), it wrongly takes the "already there" branch and falls back to
+          # plain tag_client() - which DOES switch the view, unconditionally, regardless of
+          # where the window itself was. That's cursor-position-dependent and happened
+          # exactly as reported live. tagsilent (tag_silent(), src/dispatch/bind.c) never
+          # calls client_switch_view() under any condition - genuinely, unconditionally
+          # silent - but in exchange it's back to being a pure bitmask flip with no monitor
+          # reassignment, so a window sent to a tag nobody's currently viewing on its own
+          # monitor can go invisible until you view that tag from its actual home monitor.
+          # Explicit tradeoff, chosen per repeated explicit request to never switch view on
+          # send. Autostarted apps (window_rule's "monitor:" field below) are a separate code
+          # path - this doesn't affect their placement at all.
           "SUPER,1,viewcrossmon,1,DP-3"
           "SUPER,2,viewcrossmon,2,DP-3"
           "SUPER,3,viewcrossmon,3,HDMI-A-1"
@@ -337,6 +385,18 @@ in
         # is_tag_silent:1,...) confirmed from DreamMaoMao's own real-world rule.conf, which is
         # also where the exact com.obsproject.Studio app_id below comes from.
         #
+        # Every entry also carries monitor:<name> now - confirmed bug, reported live:
+        # "tags:N" alone only sets a tag bitmask (ConfigWinRule.tags), with no monitor
+        # affinity at all - since tags are global/shared bitmasks (any monitor can
+        # independently view any tag number), an app could just as easily render on
+        # whichever monitor happens to be viewing that tag when it opens, not its intended
+        # home. "monitor:<name>" (ConfigWinRule.monitor, confirmed from
+        # src/config/option_defs.c) is a SEPARATE field that src/manage/client.c's rule-
+        # application code uses to actually pick which Monitor struct the client gets
+        # assigned to (`match_monitor_spec(r->monitor, m)` then `mon = m`) - same mechanism
+        # as tagcrossmon's fix above, just for static window rules instead of keybinds.
+        # Monitor groups match the viewcrossmon/tagcrossmon binds above.
+        #
         # app_id confirmed against this repo's existing Hyprland window/class rules: librewolf,
         # REAPER, vesktop, mpv (home-manager/hyprland/{keybinds,default}.nix,
         # home-manager/hyprland/startup.nix). telegram-desktop, transmission-remote-gtk,
@@ -345,29 +405,52 @@ in
         # `mmsg get window` (or whatever mango's IPC query command turns out to be) while the
         # app is focused, and fix the app_id string here if it doesn't match.
         window_rule = [
-          "tags:1,app_id:vesktop" # discord
-          "tags:5,is_tag_silent:1,app_id:librewolf" # q - browser
-          "tags:6,app_id:steam" # w - steam/games (UNVERIFIED app_id)
-          "tags:7,app_id:REAPER" # e
-          "tags:8,is_tag_silent:1,app_id:org.telegram.desktop" # a - telegram (UNVERIFIED app_id)
-          "tags:10,app_id:mpv" # d - media viewing
-          "tags:10,is_tag_silent:1,app_id:transmission-remote-gtk" # d (UNVERIFIED app_id)
+          "tags:1,monitor:DP-3,app_id:vesktop" # discord
+          "tags:5,monitor:DP-3,is_tag_silent:1,app_id:librewolf" # q - browser
+          "tags:6,monitor:HDMI-A-1,app_id:steam" # w - steam/games (UNVERIFIED app_id)
+          "tags:7,monitor:HDMI-A-1,app_id:REAPER" # e
+          "tags:8,monitor:DP-3,is_tag_silent:1,app_id:org.telegram.desktop" # a - telegram (UNVERIFIED app_id)
+          "tags:10,monitor:HDMI-A-1,app_id:mpv" # d - media viewing
+          "tags:10,monitor:HDMI-A-1,is_tag_silent:1,app_id:transmission-remote-gtk" # d (UNVERIFIED app_id)
           # Companion terminal for tag 10, matched by title instead of app_id since app_id
           # "kitty" alone would catch every terminal, not just this one - mirrors Hyprland
           # startup.nix spawning kitty+transmission-remote-gtk together in ~/_CURRENT (see
           # autostart_sh below for the actual spawn).
-          "tags:10,is_tag_silent:1,title:current-media"
-          "tags:11,app_id:com.obsproject.Studio" # z - OBS
-          "tags:13,app_id:Pavucontrol" # c - audio control (UNVERIFIED app_id)
-          "tags:13,app_id:qjackctl" # c - audio control (UNVERIFIED app_id)
+          "tags:10,monitor:HDMI-A-1,is_tag_silent:1,title:current-media"
+          "tags:11,monitor:DP-3,app_id:com.obsproject.Studio" # z - OBS
+          "tags:13,monitor:HDMI-A-1,app_id:org.pulseaudio.pavucontrol" # c - confirmed live via `mmsg get all-clients` (was "Pavucontrol" - wrong, never matched, which is why it landed on whatever tag HDMI-A-1 happened to be viewing at launch instead of tag 13)
+          "tags:13,monitor:HDMI-A-1,app_id:qjackctl" # c - audio control (UNVERIFIED app_id)
           # s (9, "another game/steam") and x (12, misc) are intentionally left as plain
           # unassigned tags - they're where you manually move whatever's using them that day,
           # not tied to one fixed app.
+
+          # Idle-inhibit while focused - ported from Hyprland's window_rule idle_inhibit =
+          # "focus" entries (home-manager/hyprland/default.nix: librewolf, YouTube, mpv,
+          # REAPER). Real config key confirmed as "idle_inhibit_when_focus" (underscored;
+          # the struct field name internally is "idleinhibit_when_focus" with no underscore,
+          # don't confuse the two) from mangowc's src/config/option_defs.c. Dropped the
+          # "YouTube" entry - that was matching a browser PWA window class specific to how
+          # Hyprland's librewolf PWA setup names its windows, not something confirmed to
+          # exist/match the same way under Mango.
+          "idle_inhibit_when_focus:1,app_id:librewolf"
+          "idle_inhibit_when_focus:1,app_id:mpv"
+          "idle_inhibit_when_focus:1,app_id:REAPER"
         ];
       };
 
       autostart_sh = ''
         ironbar &
+        # Was missing entirely - no idle/DPMS handling existed for Mango at all before this
+        # (home-manager/hyprland/idle.nix's services.hypridle is Hyprland-only, drives DPMS
+        # via "hyprctl eval"). swayidle is compositor-generic - it talks to the standard
+        # ext-idle-notify-v1 protocol, which Mango implements natively
+        # (src/main.c: wlr_idle_notifier_v1_create()) - same category as gammastep/wlsunset
+        # above, a "sway-named but actually generic" tool. Only replicates the DPMS
+        # timeout/resume listener from hypridle, not the lock_cmd one -
+        # config.custom.hyprland.lock is false on this host, so that listener was never
+        # active here either. -w waits for each command to finish before processing the
+        # next idle event, same convention hypridle/swayidle configs normally use.
+        ${swayidle} -w timeout 300 '${mmsgDispatchAll "sleep_monitor"}' resume '${mmsgDispatchAll "wakeup_monitor"}' &
         # Was missing entirely - the actual cause of "wrong keyboard layout in effect" /
         # fcitx not in the tray. Hyprland's startup.nix starts this the same bare way.
         fcitx5 &
@@ -379,6 +462,28 @@ in
         # with transmission-remote-gtk on tag 10 (d), same grouping Hyprland startup.nix used.
         kitty --title current-media --directory ~/_CURRENT &
         transmission-remote-gtk &
+        # Was missing entirely - genuinely autostarted under Hyprland too
+        # (home-manager/hyprland/startup.nix: openOnWorkspace 8 "telegram-desktop"). Confirmed
+        # bug: "telegram-desktop" is NOT the real binary name on this system - the actual
+        # installed binary is "Telegram" (capital T, home-manager/programs/telegram.nix just
+        # installs pkgs.telegram-desktop as-is, which ships that binary name) - the wrong
+        # command was failing silently in the background every boot. Paired with the
+        # "tags:8,app_id:org.telegram.desktop" window_rule above.
+        Telegram &
+        # vesktop/discord was never autostarted under Hyprland either (manually launched) -
+        # added now per explicit request. Uses the same wrapper Hyprland users would launch
+        # it with (home-manager/programs/discord.nix's "discord-vesktop", not a raw "vesktop"
+        # binary) - disables NIXOS_OZONE_WL and forces --use-gl=desktop to avoid an
+        # Electron/Wayland rendering issue. Paired with the "tags:1,app_id:vesktop"
+        # window_rule above.
+        discord-vesktop &
+        # pavucontrol was also genuinely autostarted under Hyprland
+        # (openOnWorkspace 13 "pavucontrol"); qjackctl was NOT (it only had a float/size
+        # window_rule there, never launched) - added anyway per explicit request. Paired
+        # with the "tags:13,app_id:org.pulseaudio.pavucontrol"/"tags:13,app_id:qjackctl"
+        # window_rules above.
+        pavucontrol &
+        qjackctl &
       '';
 
       systemd = {
@@ -395,14 +500,14 @@ in
       };
     };
 
-    home.packages = [ pkgs.ironbar pkgs.gammastep pkgs.monocraft ];
+    home.packages = [ pkgs.ironbar pkgs.gammastep pkgs.monocraft pkgs.swayidle ];
 
     # Styling - mirrors home-manager/hyprland/waybar.nix's wallust "waybar.css" template as
     # closely as ironbar's selector set allows (confirmed from ironbar's own Styling guide:
     # `.background`/`#bar` for the bar itself, `.widget` for "any widget" - the equivalent of
     # waybar's per-module baseModuleCss applied broadly rather than per-class). Font changed
     # to Monocraft per request (added to home.packages above so fontconfig actually has it);
-    # background set to a solid #1C1A1C rather than copying waybar's literal
+    # background set to a solid black rather than copying waybar's literal
     # `rgba(0,0,0,0.0)` - that one was fully transparent, not a solid color to port over.
     xdg.configFile."ironbar/style.css".text = ''
       * {
@@ -412,7 +517,7 @@ in
 
       .background,
       #bar {
-        background-color: #1C1A1C;
+        background-color: #000000;
       }
 
       .widget {
@@ -421,6 +526,28 @@ in
         font-size: 14px;
         color: #fecdb2;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      /* Broad GTK element reset, not a per-module patch - the grey background wasn't
+         specific to the clock (that one was only fixed by removing a stray inner "button"
+         widget nesting, a separate bug). GTK renders most clickable ironbar modules
+         (volume, tray icons, inhibit, battery, brightness, any future one) as actual
+         GtkButton widgets internally, each with GTK's default hover/pressed/checked
+         background - confirmed per ironbar's own Styling guide ("you can target all GTK
+         widgets of a certain type directly using their name... button:hover will select
+         the hover state on *all* buttons"). Resetting the bare "button" element here means
+         every current AND future module gets this for free, instead of chasing it down
+         module by module. */
+      button,
+      button:hover,
+      button:active,
+      button:checked,
+      button:focus {
+        background: none;
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        outline: none;
       }
     '';
 
@@ -468,23 +595,18 @@ in
           start = [
             {
               type = "custom";
+              # on_click_left/on_click_right belong on the OUTER module, not nested on an
+              # inner "button" widget - confirmed broken live (clicks did nothing, and the
+              # button widget's default GTK chrome was the stray grey background). The
+              # working brightness-ddc module below already does it this way; a plain
+              # "label" widget is enough since the module itself receives these events, no
+              # button needed. Left click keeps the ISO toggle; right click re-opens the
+              # native calendar popup via the "popup:toggle" bar command - confirmed working
+              # now that it's wired to the right place.
+              on_click_left = "!${ironbarClockToggle}";
+              on_click_right = "popup:toggle";
               bar = [
-                {
-                  type = "button";
-                  # on_click_left/on_click_right are generic module-level event hooks
-                  # (present on every module/widget, not just the button widget's own single
-                  # "on_click") - confirmed from ironbar's wiki Configuration guide, section
-                  # 3.2. Left click keeps the ISO toggle; right click re-opens the native
-                  # calendar popup via the special "popup:toggle" bar command (the same
-                  # command Custom.md's own power-menu example uses on a button's on_click -
-                  # UNVERIFIED whether it also works from on_click_right specifically rather
-                  # than only the widget's primary on_click, test live).
-                  on_click_left = "!${ironbarClockToggle}";
-                  on_click_right = "popup:toggle";
-                  widgets = [
-                    { type = "label"; label = "{{1000:${ironbarClockLabel "󰥔 %H:%M:%S 󰸗 %a, %d %b %Y"}}}"; }
-                  ];
-                }
+                { type = "label"; label = "{{1000:${ironbarClockLabel "󰥔 %H:%M:%S 󰸗 %a, %d %b %Y"}}}"; }
               ];
               # Re-nests a plain native clock widget (disable_popup so IT doesn't try to open
               # a popup of its own) as the content of OUR popup - same pattern Custom.md's own
@@ -498,12 +620,16 @@ in
             {
               type = "sys_info";
               # memory + temperature + cpu + network, one label each - same grouping/order as
-              # the four separate waybar modules they replace. temp_c sensor id ("CPUTIN") is
-              # a guess at the lm-sensors label for this board, NOT confirmed - check `sensors`
-              # output and fix if that label shows nothing.
+              # the four separate waybar modules they replace. temp_c sensor label confirmed
+              # live via `sensors` - this machine's CPU temp comes from the "coretemp-isa-0000"
+              # chip (Intel), with "Package id 0" as the overall-package label (not "CPUTIN",
+              # that's an AMD/motherboard-sensor convention and was always a guess - it showed
+              # 0C because no sensor on this system has that label at all). ironbar's token
+              # parser (src/modules/sysinfo/parser.rs) reads the @-argument verbatim including
+              # spaces, so the literal space in "Package id 0" is fine as-is.
               format = [
                 " {memory_used}/{memory_total}GB ({memory_percent}%)"
-                " {temp_c@CPUTIN}°C"
+                " {temp_c@Package id 0}°C"
                 " {cpu_percent}% @ {cpu_frequency}GHz"
                 "󰓢 {net_down@eno1}/{net_up@eno1}Mbps"
               ];
@@ -557,15 +683,10 @@ in
           ++ [
             {
               type = "custom";
+              on_click_left = "!${ironbarClockToggle}";
+              on_click_right = "popup:toggle";
               bar = [
-                {
-                  type = "button";
-                  on_click_left = "!${ironbarClockToggle}";
-                  on_click_right = "popup:toggle";
-                  widgets = [
-                    { type = "label"; label = "{{1000:${ironbarClockLabel "󰥔 %H:%M"}}}"; }
-                  ];
-                }
+                { type = "label"; label = "{{1000:${ironbarClockLabel "󰥔 %H:%M"}}}"; }
               ];
               popup = [
                 { type = "clock"; disable_popup = true; }

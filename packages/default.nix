@@ -30,4 +30,6 @@ decent-sampler-dynamic = w pkgs.callPackage ./decent-sampler-dynamic { };
 
   csakura = w pkgs.callPackage ./csakura { };
 
+  terrascope = pkgs.callPackage ./terrascope { };
+
 }

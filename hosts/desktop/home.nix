@@ -28,9 +28,29 @@
     displays = [
       {
         # left half: keys 1, 2, q, a, z, x all live here.
+        #
+        # Same physical ultrawide panel as HDMI-A-1 below, either whole
+        # (single 5120x1440@144 output, PIP/PBP off, HDMI unplugged) or
+        # split in half (this half becomes 2560x1440@60, PIP/PBP on). A
+        # fixed "5120x1440@144" mode here only ever matched the first
+        # state - in split mode DP-3 reports itself as a plain 2560x1440
+        # panel over EDID and the fixed mode simply doesn't exist on the
+        # output, so Hyprland would fail to apply it.
+        #
+        # First tried "preferred" - WRONG, confirmed live via `hyprctl
+        # monitors`: this panel's EDID preferred-timing flag points at a
+        # 1920x1080@60 compatibility fallback, not its native resolution,
+        # even though "5120x1440@144.00Hz" is right there at the top of
+        # its own availableModes list. A quirk of this specific monitor's
+        # EDID, not something guessable from the config alone. "highres"
+        # (confirmed from Hyprland's wiki: "use the highest supported
+        # resolution") ignores that flag entirely and picks the actual
+        # highest-resolution mode the panel is advertising right now -
+        # 5120x1440@144 when whole, whatever the half-panel's true max is
+        # when split - so this still adapts to either PBP state without
+        # trusting the one EDID field that turned out to be wrong.
         display_name_output = "DP-3";
-        mode = "5120x1440@144";
-        wlr_mode = "5120x1440@143.996994";
+        mode = "highres";
         position = "0x0";
         scale = 1.0;
         transform = 0;
@@ -56,8 +76,12 @@
         # at matching resolution/height so the cursor tracks correctly
         # across the seam instead of jumping to a stacked-below offset.
         # keys 3, 4, w, e, s, d, c all live here.
+        # Same reasoning as DP-3 above - "highres" instead of a fixed
+        # 2560x1440@60 or the EDID-unreliable "preferred", so this just
+        # adapts whenever the output actually exists (split PBP mode)
+        # instead of assuming a fixed mode or trusting that EDID flag.
         display_name_output = "HDMI-A-1";
-        mode = "2560x1440@60";
+        mode = "highres";
         position = "2560x0";
         scale = 1.0;
         transform = 0;
@@ -82,7 +106,13 @@
       # since hwmonN numbering for coretemp isn't fixed across boots
       hwmon = "/run/coretemp-temp1_input";
     };
-    wayvnc.enable = true;
+    # Disabled - the headless mirror output this creates (home-manager/
+    # hyprland/wayvnc.nix) was stealing workspaces (w, d, etc. became
+    # unreachable) even after fixing the mirror relationship itself. wayvnc
+    # can't run without some output to capture, so disabling it removes the
+    # headless monitor entirely rather than leaving wayvnc crash-looping
+    # with nothing to serve.
+    wayvnc.enable = false;
 
     # Select touchscreen monitor by id
     # Find out monitor ID and names with "hyprctl monitors" command

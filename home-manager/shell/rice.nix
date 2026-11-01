@@ -18,6 +18,7 @@
       cbonsai
       cmatrix
       custom.csakura
+      custom.terrascope
       hollywood
       fastfetch
       cpufetch

@@ -27,13 +27,49 @@ let
         }
       '';
 
+  # Minimal/compact/no-rounded-corners override layer, applied on top of whatever the
+  # imported preset theme (rofi-themes type-2/style-2) set - appended after
+  # additionalStyles in fixupRofiThemesRasi below so it wins the cascade on any shared
+  # selector.
+  compactStyles = ''
+    window {
+      border-radius: 0px;
+      border: 0px;
+      padding: 0px;
+    }
+    mainbox {
+      padding: 6px;
+      spacing: 4px;
+    }
+    inputbar {
+      border-radius: 0px;
+      padding: 6px 8px;
+      spacing: 6px;
+    }
+    listview {
+      spacing: 2px;
+      padding: 2px 0px;
+    }
+    element {
+      border-radius: 0px;
+      padding: 4px 8px;
+    }
+    element-icon {
+      size: 20px;
+    }
+    scrollbar {
+      width: 2px;
+      border-radius: 0px;
+    }
+  '';
+
   # replace the imports with preset theme / wallust
   fixupRofiThemesRasi = rasiPath: additionalStyles: ''
     ${themeStyles}
     ${lib.replaceStrings
       [
         "@import"
-        ""
+        ""
       ]
       [
         "// @import"
@@ -45,6 +81,7 @@ let
       width: ${toString cfg.width}px;
     }
     ${additionalStyles}
+    ${compactStyles}
   '';
 in
 {
@@ -66,7 +103,7 @@ in
           (lib.readFile "${powermenuDir}/style-${toString powermenuStyle}.rasi")
           + ''
             * { background-window: black/60%; } // darken background
-            window { border-radius: 12px; } // no rounded corners as it doesn't interact well with blur on hyprland
+            window { border-radius: 0px; } // minimal/compact styling, no rounded corners
           ''
         ))
       ] (lib.readFile ./rofi-power-menu.sh);
@@ -91,7 +128,7 @@ in
     ];
 
     window_rule = [
-      { match.class = "Rofi"; float = true; center = true; rounding = 12; }
+      { match.class = "Rofi"; float = true; center = true; rounding = 0; }
     ];
   };
 

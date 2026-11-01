@@ -28,7 +28,7 @@
       };
       width = lib.mkOption {
         type = lib.types.int;
-        default = 800;
+        default = 500;
         description = "Rofi launcher width";
       };
     };
