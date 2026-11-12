@@ -20,6 +20,9 @@ in
     monero.enable = lib.mkEnableOption "monero" // {
       default = false;
     };
+    xmrig.enable = lib.mkEnableOption "xmrig GPU mining (manual start only)" // {
+      default = false;
+    };
     docker.enable = lib.mkEnableOption "docker" // {
       default = cfg.distrobox.enable;
     };

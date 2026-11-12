@@ -21,6 +21,7 @@
     ./samba.nix
     ./fileshare.nix
     ./monero.nix
+    ./xmrig.nix
     # ./sws.nix # need for later
     ./dns.nix
     ./pr_managment.nix

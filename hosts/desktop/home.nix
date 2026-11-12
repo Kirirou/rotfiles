@@ -132,6 +132,7 @@
 
     blender.enable = true;
     reaper.enable = true;
+    xmrig.enable = true;
 
     discord.enable = true;
     telegram.enable = true;

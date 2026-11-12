@@ -32,4 +32,8 @@ decent-sampler-dynamic = w pkgs.callPackage ./decent-sampler-dynamic { };
 
   terrascope = pkgs.callPackage ./terrascope { };
 
+  lynx-share = w pkgs.callPackage ./lynx-share { };
+
+  dropstone = pkgs.callPackage ./dropstone { };
+
 }

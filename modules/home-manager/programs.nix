@@ -41,6 +41,9 @@
     reaper.enable = lib.mkEnableOption "reaper" // {
       default = false;
     };
+    xmrig.enable = lib.mkEnableOption "xmrig mining user service (manual start only)" // {
+      default = false;
+    };
     blender.enable = lib.mkEnableOption "blender" // {
       default = false;
     };

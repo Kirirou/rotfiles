@@ -73,6 +73,11 @@
       url = "github:jeffthepineapple/desktop-goose-linux-port";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    gpu-unlock = {
+      url = "github:Sticzu/nixos-gpu-unlock";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # flake-utils is unnecessary

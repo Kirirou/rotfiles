@@ -59,15 +59,35 @@ in {
       script = ''
         set -uo pipefail
 
-        if ! zpool import ${backup-gold-pool} 2>&1; then
-          echo "backup-gold: drive not present or import failed, skipping (will retry next scheduled run)"
-          exit 0
+        # `zpool import` fails both when the pool is genuinely absent AND
+        # when it's already imported (eg. someone imported it by hand) -
+        # treating every failure as "absent" meant an already-imported
+        # pool got silently skipped instead of synced. Check for that case
+        # first instead of relying on the exit code of the import attempt.
+        if ! zpool list -H ${backup-gold-pool} >/dev/null 2>&1; then
+          if ! zpool import ${backup-gold-pool} 2>&1; then
+            echo "backup-gold: drive not present or import failed, skipping (will retry next scheduled run)"
+            exit 0
+          fi
         fi
 
         trap 'zpool export ${backup-gold-pool} 2>/dev/null || true' EXIT
 
         echo "backup-gold: drive present, starting sync"
-        syncoid --recursive wdc-blue ${backup-gold-pool}
+        # Sync the two managed datasets explicitly rather than
+        # `--recursive wdc-blue`: the parent dataset itself is never
+        # snapshotted by sanoid (only its children are, above), so its
+        # snapshot history on backup-gold never lines up with source and
+        # syncoid refuses to touch it ("Cowardly refusing to destroy your
+        # existing target") - which fails the whole run even though the
+        # actual data/okii children sync fine underneath it.
+        # --delete-target-snapshots: without it, syncoid only ever adds
+        # snapshots - it never removes ones sanoid already expired on the
+        # source, so backup-gold silently accumulates stale history forever
+        # (confirmed: 319 vs 68 snapshots on data, 175 vs 31 on okii) and
+        # eats into free space that never actually gets reclaimed.
+        syncoid --delete-target-snapshots ${wdc-data-dataset} ${backup-gold-pool}/data
+        syncoid --delete-target-snapshots ${wdc-okii-dataset} ${backup-gold-pool}/okii
       '';
     };
 

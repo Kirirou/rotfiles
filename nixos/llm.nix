@@ -150,6 +150,12 @@ lib.mkIf config.custom.llm.enable {
   # service above needs.
   systemd.services.llama-cpp.serviceConfig.SupplementaryGroups = [ "render" "video" ];
 
+  # Upstream module wants this on multi-user.target (auto-start on every
+  # boot). Loading a 24GB GGUF onto the GPU should only happen when
+  # actually wanted, not on every reboot - strip that, unit stays fully
+  # controllable via `systemctl start llama-cpp`.
+  systemd.services.llama-cpp.wantedBy = lib.mkForce [ ];
+
   # Root is a 1GB tmpfs on this host (impermanence) - something recreates
   # /var/cache/private fresh on every boot/activation at the default 0755,
   # but systemd's DynamicUser CacheDirectory= machinery refuses to use it

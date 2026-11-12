@@ -463,6 +463,26 @@
         "type": "github"
       }
     },
+    "gpu-unlock": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792932277,
+        "narHash": "sha256-F9Sn60EePraD722xgL+CU2t1/ZxaPZm5zZ66+xP1mN4=",
+        "owner": "Sticzu",
+        "repo": "nixos-gpu-unlock",
+        "rev": "82615dd702b87b5e597aa9703fc18d5c7acd417f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Sticzu",
+        "repo": "nixos-gpu-unlock",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1316,6 +1336,7 @@
         "dzgui": "dzgui",
         "fenix": "fenix",
         "focal": "focal",
+        "gpu-unlock": "gpu-unlock",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "ie-r": "ie-r",

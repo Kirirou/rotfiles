@@ -1,0 +1,6 @@
+[lynx-share]
+# Bump this when a new release is published: https://github.com/Ka1-S/LYNX-SHARE/releases
+src.manual = "0.1.21-alpha"
+url.name = "LYNX-0.1.21-alpha-linux-x86_64.tar.gz"
+
+fetch.url = "https://github.com/Ka1-S/LYNX-SHARE/releases/download/v0.1.21-alpha/LYNX-0.1.21-alpha-linux-x86_64.tar.gz"

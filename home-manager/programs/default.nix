@@ -14,6 +14,8 @@
     ./obs-studio.nix
     ./irc.nix
     ./kiwix.nix
+    ./lynx-share.nix
+    ./dropstone.nix
     ./rofi.nix
     ./vlc.nix
     ./wallust.nix
@@ -23,6 +25,7 @@
     ./telegram.nix
     ./blender.nix
     ./reaper.nix
+    ./xmrig.nix
     ./k3b.nix
   ];
 }

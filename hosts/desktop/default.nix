@@ -1,6 +1,16 @@
-{ user, pkgs, ... }:
+{ user, pkgs, inputs, ... }:
 {
-  imports = [ ./minecraft-servers.nix ];
+  imports = [
+    ./minecraft-servers.nix
+    # Removes NVIDIA's artificial FP16/BF16 tensor-throughput cap on this
+    # card (RTX 3060 Ti, Ampere/GA104) by patching Falcon/GSP firmware in
+    # early initrd, before the proprietary driver binds - no VBIOS flash,
+    # fully reversible by removing this import and rebooting. Needs an
+    # actual reboot after switching (early-initrd, not something a service
+    # restart can apply). Benchmarked baseline before enabling this:
+    # pp512 24358 t/s, tg128 448.5 t/s on a small fully-GPU-resident model.
+    inputs.gpu-unlock.nixosModules.default
+  ];
   custom = {
     # hardware
     xkbLayout = "jp";
@@ -28,10 +38,11 @@
     samba.enable = false;
 
     monero.enable = true;
+    xmrig.enable = true;
     mango.enable = true;
     wine.enable = true;
     distrobox.enable = false;
-    jellyfin.enable = false;
+    jellyfin.enable = true;
     pr_managment.enable = true;
     nginx.enable = true;
     llm.enable = true;

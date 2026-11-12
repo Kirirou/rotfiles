@@ -49,20 +49,28 @@
             exit 1
           fi
 
-          # Detect which display numbers actually exist instead of assuming a
-          # fixed range: a hardcoded range aborts the whole script (set -e)
-          # the moment it hits a display index that isn't connected, since
-          # ddcutil fails hard on an unknown --display N.
-          displays=$(ddcutil detect --terse | grep -oP '(?<=^Display )\d+')
+          # ddcutil detect does a full I2C bus scan, which is slow (1-3s+).
+          # Cache the display list instead of re-scanning on every call, since
+          # this runs on every waybar scroll tick otherwise.
+          cache="''${XDG_RUNTIME_DIR:-/tmp}/bbb-displays"
+          if [ ! -s "$cache" ] || [ -n "$(find "$cache" -mmin +10 2>/dev/null)" ]; then
+            ddcutil detect --terse | grep -oP '(?<=^Display )\d+' > "$cache"
+          fi
+          displays=$(cat "$cache")
 
           if [ -z "$displays" ]; then
             echo "bbb: no DDC/CI displays detected"
             exit 1
           fi
 
+          # --sleep-multiplier shrinks ddcutil's conservative built-in protocol
+          # delays, --noverify skips the read-back verification; both cut
+          # per-call latency substantially. Run in parallel across monitors.
           for i in $displays; do
-            ddcutil --display "$i" setvcp 10 "$1" || echo "bbb: failed to set brightness on display $i"
+            ddcutil --display "$i" --sleep-multiplier 0.1 --noverify setvcp 10 "$1" \
+              || echo "bbb: failed to set brightness on display $i" &
           done
+          wait
         '';
       })
     ];
